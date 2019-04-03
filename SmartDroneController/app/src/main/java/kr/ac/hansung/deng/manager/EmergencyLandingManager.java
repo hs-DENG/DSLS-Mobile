@@ -1,13 +1,18 @@
 package kr.ac.hansung.deng.manager;
 
 
-public class EmergencyLandingManager {
+import kr.ac.hansung.deng.service.EmergencyService;
+
+public class EmergencyLandingManager{
+
     private static EmergencyLandingManager instance = new EmergencyLandingManager();
     public static EmergencyLandingManager getInstance(){return instance;}
     private EmergencyLandingManager(){}
 
+
+    private EmergencyService service = new EmergencyService();
+
     public DroneSDKManager sdkManager;
-    private SagementManager sagementManager;
 
 
     public DroneSDKManager getSdkManager() {
@@ -16,4 +21,5 @@ public class EmergencyLandingManager {
     public void setSdkManager(DroneSDKManager sdkManager){
         this.sdkManager = sdkManager;
     }
+
 }

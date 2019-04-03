@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#22FF99"
     android:orientation="vertical"
-    tools:context="kr.ac.hansung.deng.smartdronecontroller.kr.ac.hansung.deng.app.MainActivity">
+    tools:context="kr.ac.hansung.deng.smartdronecontroller.kr.ac.hansung.deng.app.ConnectActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

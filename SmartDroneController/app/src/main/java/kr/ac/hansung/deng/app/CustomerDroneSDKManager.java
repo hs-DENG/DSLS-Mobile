@@ -1,4 +1,4 @@
-package kr.ac.hansung.deng.smartdronecontroller;
+package kr.ac.hansung.deng.app;
 
 import kr.ac.hansung.deng.manager.DroneSDKManager;
 
