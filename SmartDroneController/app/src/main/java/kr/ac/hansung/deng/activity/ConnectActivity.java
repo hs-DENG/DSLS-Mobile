@@ -11,7 +11,7 @@ import kr.ac.hansung.deng.manager.DroneSDKManager;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 
 public class ConnectActivity extends AppCompatActivity {
-
+    private final String TAG = ConnectActivity.class.getSimpleName();
     private DroneSDKManager sdkManager;
 
     @Override

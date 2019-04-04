@@ -10,7 +10,7 @@ import kr.ac.hansung.deng.manager.DroneSDKManager;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 
 public class MainActivity extends AppCompatActivity {
-
+    private final String TAG =MainActivity.class.getSimpleName();
     private DroneSDKManager sdkManager;
 
     @Override

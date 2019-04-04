@@ -14,7 +14,7 @@ import kr.ac.hansung.deng.service.EmergencyService;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 
 public class EmergencyActivity extends AppCompatActivity {
-
+    private final String TAG = EmergencyActivity.class.getSimpleName();
     private EmergencyService myService = null;
     private boolean mBound = false;
 
@@ -42,7 +42,7 @@ public class EmergencyActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("EmergencyActivity", "emergencyActivity onStart()");
+        Log.d(TAG, "emergencyActivity onStart()");
         //서비스와 연결
         Intent intent = new Intent(this, EmergencyService.class);
         startService(intent);
@@ -62,7 +62,7 @@ public class EmergencyActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
-        Log.d("EmergencyActivity", "emergencyActivity onStop()");
+        Log.d(TAG, "emergencyActivity onStop()");
         //서비스와 연결 해제
         if(mBound){
             unbindService(mConnection);
