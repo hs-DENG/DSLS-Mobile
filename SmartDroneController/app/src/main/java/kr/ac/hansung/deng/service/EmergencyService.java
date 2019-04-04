@@ -25,7 +25,10 @@ public class EmergencyService extends Service {
         if(mThread == null){
             mThread = new Thread("My Thread"){
                 @Override
-                public void run() {
+                public void run(){
+                    // 이미지 정보 받기 ( 드론 정보 서비스로부터)
+                    // 캡쳐 이미지 모델에 돌리기
+                    //
 
                     for(int i=0; i<100; i++){
                         mCount++;
@@ -52,9 +55,7 @@ public class EmergencyService extends Service {
 
         if(mThread != null)
             mThread = null;
-
     }
-
 
     public class MyBinder extends Binder {
         public EmergencyService getService(){

@@ -4,31 +4,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#22FF99"
-    android:orientation="vertical"
-    tools:context="kr.ac.hansung.deng.smartdronecontroller.kr.ac.hansung.deng.app.MainActivity">
+    android:orientation="horizontal"
+    tools:context="kr.ac.hansung.deng.app.MainActivity">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="">
-
-    </LinearLayout>
+        android:layout_weight="5"
+        android:orientation="horizontal"></LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/connect_btn"
+            android:id="@+id/btn_emergency"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:onClick="onConnect"
-            android:text="드론과 연결하기" />
+            android:onClick="onClickEmergency"
+            android:text="비상 착륙" />
     </LinearLayout>
-
 </LinearLayout>

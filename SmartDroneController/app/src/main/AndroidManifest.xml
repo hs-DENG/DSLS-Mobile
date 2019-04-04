@@ -22,6 +22,10 @@
         <service
             android:name="kr.ac.hansung.deng.service.EmergencyService"
             android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name="kr.ac.hansung.deng.service.DroneInfoService"
+            android:enabled="true"
             android:exported="true"></service>
     </application>
 

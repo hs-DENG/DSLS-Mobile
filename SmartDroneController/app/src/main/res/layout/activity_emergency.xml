@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="kr.ac.hansung.deng.smartdronecontroller.kr.ac.hansung.deng.app.EmergencyActivity">
+    tools:context="kr.ac.hansung.deng.activity.EmergencyActivity">
 
     <Button
         android:id="@+id/button"
