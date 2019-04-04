@@ -18,8 +18,8 @@ public class ImageDivide {
     private int size;//분할하고자 하는 크기
 
     /**
-    @param capturedImage : 비트맵 이미지
-    @param size : 분할할 크기
+     @param capturedImage : 비트맵 이미지
+     @param size : 분할할 크기
      */
     public ImageDivide(Bitmap capturedImage,int size){
         croppedImages = new ArrayList<Bitmap>();
@@ -58,13 +58,13 @@ public class ImageDivide {
                     croppedImage = Bitmap.createBitmap(capturedImage,0,0,width/size,height/size);
                 }
                 else if(i==0){
-                    croppedImage = Bitmap.createBitmap(capturedImage,width*(i/size),0,width/size,height/size);
+                    croppedImage = Bitmap.createBitmap(capturedImage,j*width/size,0,width/size,height/size);
                 }
                 else if(j==0){
-                    croppedImage = Bitmap.createBitmap(capturedImage,0,height*(i/size),width/size,height/size);
+                    croppedImage = Bitmap.createBitmap(capturedImage,0,i*height/size,width/size,height/size);
                 }
                 else{
-                    croppedImage = Bitmap.createBitmap(capturedImage,width*(i/size),height*(i/size),width/size,height/size);
+                    croppedImage = Bitmap.createBitmap(capturedImage,j*width/size,i*height/size,width/size,height/size);
                 }
                 croppedImages.add(croppedImage);
             }
