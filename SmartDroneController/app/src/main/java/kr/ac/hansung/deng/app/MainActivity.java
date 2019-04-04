@@ -3,14 +3,17 @@ package kr.ac.hansung.deng.app;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
-import kr.ac.hansung.deng.activity.EmergencyActivity;
-import kr.ac.hansung.deng.manager.DroneSDKManager;
+import kr.ac.hansung.deng.manager.DroneInfoManager;
+import kr.ac.hansung.deng.manager.SDKManager;
+import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 
 public class MainActivity extends AppCompatActivity {
-    private final String TAG =MainActivity.class.getSimpleName();
+    private final String TAG = MainActivity.class.getSimpleName();
     private DroneSDKManager sdkManager;
 
     @Override
@@ -18,7 +21,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // sdk 연결
+        boolean hing = false;
+        sdkManager = (DroneSDKManager) getIntent().getParcelableExtra("sdkManager");
+        if(sdkManager != null){
+            // Main Activity 시작
+            DroneInfoManager droneInfoManager = new DroneInfoManager();
+
+
+        }
+        else{
+            Toast.makeText(this, "from" + TAG + " error : SDK is Null", Toast.LENGTH_SHORT);
+            finish();
+        }
     }
 
     //take off button
@@ -33,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
     //emergency button
     public void onClickEmergency(View view){
-        Intent intent = new Intent(this, EmergencyActivity.class);
-        startActivity(intent);
+        //TODO Do Smart Landing
     }
 }

@@ -1,8 +1,16 @@
 package kr.ac.hansung.deng.app;
 
-import kr.ac.hansung.deng.manager.DroneSDKManager;
+import android.os.Parcel;
 
-public class CustomerDroneSDKManager implements DroneSDKManager {
+import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
+
+public class CustomerDroneSDKManager extends DroneSDKManager {
+    public CustomerDroneSDKManager(){}
+
+
+    public CustomerDroneSDKManager(Parcel parcel) {
+        super(parcel);
+    }
 
     // connection
     @Override

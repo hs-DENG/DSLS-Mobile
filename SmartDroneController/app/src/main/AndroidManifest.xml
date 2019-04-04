@@ -18,7 +18,6 @@
         </activity>
         <activity android:name="kr.ac.hansung.deng.app.MainActivity"
             android:screenOrientation="landscape"/>
-        <activity android:name="kr.ac.hansung.deng.activity.EmergencyActivity" />
 
         <service
             android:name="kr.ac.hansung.deng.service.EmergencyService"

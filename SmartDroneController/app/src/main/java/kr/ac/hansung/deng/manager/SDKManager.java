@@ -1,9 +1,6 @@
 package kr.ac.hansung.deng.manager;
 
-
-public interface DroneSDKManager{
-    public static EmergencyLandingManager emergencyLandingManager = EmergencyLandingManager.getInstance();
-
+public interface SDKManager {
     // connection
     void connect();
 

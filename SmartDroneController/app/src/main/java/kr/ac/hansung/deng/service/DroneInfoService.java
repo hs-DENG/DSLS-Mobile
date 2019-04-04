@@ -4,10 +4,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import kr.ac.hansung.deng.manager.DroneSDKManager;
+import kr.ac.hansung.deng.manager.SDKManager;
 
 public class DroneInfoService extends Service {
-    private DroneSDKManager sdkManager;
+    private SDKManager sdkManager;
 
     public DroneInfoService() {
     }

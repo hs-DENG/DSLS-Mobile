@@ -12,13 +12,13 @@ public class EmergencyLandingManager{
 
     private EmergencyService service = new EmergencyService();
 
-    public DroneSDKManager sdkManager;
+    public SDKManager sdkManager;
 
 
-    public DroneSDKManager getSdkManager() {
+    public SDKManager getSdkManager() {
         return sdkManager;
     }
-    public void setSdkManager(DroneSDKManager sdkManager){
+    public void setSdkManager(SDKManager sdkManager){
         this.sdkManager = sdkManager;
     }
 
