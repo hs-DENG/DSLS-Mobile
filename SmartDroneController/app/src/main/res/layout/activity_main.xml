@@ -24,22 +24,24 @@
 
         <view
             android:id="@+id/right_joystick"
-            class="kr.ac.hansung.deng.activity.JoystickView"
+            class="kr.ac.hansung.deng.activity.RightJoystickView"
             id="@+id/view_right"
             layout_width="match_parent"
-            android:layout_width="100dp"
+            android:layout_width="175dp"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"
+            android:layout_weight="1"/>
 
         <view
             android:id="@+id/left_joystick"
-            class="kr.ac.hansung.deng.activity.JoystickView"
+            class="kr.ac.hansung.deng.activity.LeftJoystickView"
             id="@+id/view_left"
             layout_width="match_parent"
-            android:layout_width="100dp"
+            android:layout_width="175dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true" />
+            android:layout_alignParentBottom="true"
+            android:layout_weight="1"/>
     </RelativeLayout>
 
 </LinearLayout>
