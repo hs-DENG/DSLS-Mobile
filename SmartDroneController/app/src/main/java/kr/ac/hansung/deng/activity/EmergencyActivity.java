@@ -49,7 +49,6 @@ public class EmergencyActivity extends AppCompatActivity {
         // 바인딩되면 서비스 자동으로 시작
         bindService(intent, mConnection, BIND_AUTO_CREATE);
 
-
     }
 
     public void onClick(View view){
