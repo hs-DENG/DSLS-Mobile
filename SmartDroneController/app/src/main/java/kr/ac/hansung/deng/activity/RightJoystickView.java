@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -12,9 +13,12 @@ import android.view.View;
  * Created by khb on 2019-04-04.
  */
 
-public class JoystickView extends View implements Runnable {
+public class RightJoystickView extends View implements Runnable {
+
+    private final static String TAG = RightJoystickView.class.getSimpleName();
     // Constants
-    private final double RAD = 57.2957795;
+    //private final double RAD = 57.2957795;
+    private final double RAD = 100;
     public final static long DEFAULT_LOOP_INTERVAL = 100; // 100 ms
     public final static int FRONT = 3;
     public final static int FRONT_RIGHT = 4;
@@ -42,17 +46,17 @@ public class JoystickView extends View implements Runnable {
     private int lastAngle = 0;
     private int lastPower = 0;
 
-    public JoystickView(Context context) {
+    public RightJoystickView(Context context) {
         super(context);
         initJoystickView();
     }
 
-    public JoystickView(Context context, AttributeSet attrs) {
+    public RightJoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initJoystickView();
     }
 
-    public JoystickView(Context context, AttributeSet attrs, int defaultStyle) {
+    public RightJoystickView(Context context, AttributeSet attrs, int defaultStyle) {
         super(context, attrs, defaultStyle);
         initJoystickView();
     }
@@ -91,7 +95,8 @@ public class JoystickView extends View implements Runnable {
         xPosition = (int) getWidth() / 2;
         yPosition = (int) getWidth() / 2;
         int d = Math.min(xNew, yNew);
-        buttonRadius = (int) (d / 2 * 0.25);
+
+        buttonRadius = (int) (d / 2 * 0.4);
         joystickRadius = (int) (d / 2 * 0.75);
 
     }
@@ -149,6 +154,7 @@ public class JoystickView extends View implements Runnable {
 
         // painting the move button
         canvas.drawCircle(xPosition, yPosition, buttonRadius, button);
+        Log.d(TAG, "centerX : " + centerX + " centerY : " + centerY);
     }
 
     @Override
@@ -180,7 +186,13 @@ public class JoystickView extends View implements Runnable {
             if (onJoystickMoveListener != null)
                 onJoystickMoveListener.onValueChanged(getAngle(), getPower(),
                         getDirection());
+
+
         }
+
+        int degree = (int)(Math.toDegrees(Math.atan2(centerY - event.getY(), centerX - event.getX())));
+        //Log.d(TAG, "각도 : " + degree);
+        mappingWithSDK(degree);
         return true;
     }
 
@@ -233,6 +245,7 @@ public class JoystickView extends View implements Runnable {
         int a = 0;
         if (lastAngle <= 0) {
             a = (lastAngle * -1) + 90;
+
         } else if (lastAngle > 0) {
             if (lastAngle <= 90) {
                 a = 90 - lastAngle;
@@ -274,6 +287,27 @@ public class JoystickView extends View implements Runnable {
             } catch (InterruptedException e) {
                 break;
             }
+        }
+    }
+
+    // 오른쪽 조이스틱 sdk와 연결
+    public void mappingWithSDK(int degree){
+
+        if(degree > 45 && degree <135){
+            // forward
+            Log.d(TAG, "forward");
+        }
+        else if(degree > 135 && degree <180 || degree > -180 && degree < -135){
+            // right
+            Log.d(TAG, "right");
+        }
+        else if(degree > -135 && degree <-45){
+            //back
+            Log.d(TAG, "back");
+        }
+        else{
+            // left
+            Log.d(TAG, "left");
         }
     }
 }
