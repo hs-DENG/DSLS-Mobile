@@ -16,7 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="kr.ac.hansung.deng.app.MainActivity" />
+        <activity android:name="kr.ac.hansung.deng.app.MainActivity"
+            android:screenOrientation="landscape"/>
         <activity android:name="kr.ac.hansung.deng.activity.EmergencyActivity" />
 
         <service
