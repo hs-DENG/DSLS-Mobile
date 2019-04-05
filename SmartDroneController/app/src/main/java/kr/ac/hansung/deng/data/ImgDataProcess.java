@@ -7,23 +7,45 @@ import android.graphics.BitmapFactory;
 import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
+import kr.ac.hansung.deng.activity.EmergencyActivity;
+import kr.ac.hansung.deng.app.MainActivity;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 
-public class ImgDataProcess implements DataProcessor {
+/**
+ * Image data process
+ *
+ * 넘어온 이미지를 형식에 따라 bitmap으로 변경시켜주는 class
+ *
+ * bytes , filePath , stream으로 넘어오는 경우에
+ * overloading 되어 있는 process 메소드를 통해 convert
+ */
 
-    @Override
-    public void process() {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        //Resources res= getResources();
+public class ImgDataProcess{
 
+    private Bitmap capturedImage;
 
-        //Bitmap bitmap = BitmapFactory.decodeResource(res, R.drawable.icon);
-
-        //bitmap.compress(Bitmap.CompressFormat.PNG, 100, outStream);
-
-
-        byte[] image = outStream.toByteArray();
-        String profileImageBase64 = Base64.encodeToString(image, 0);
+    //byte 데이터로 넘어오는 경우
+    public void process(byte [] bytes) {
+        capturedImage = BitmapFactory.decodeByteArray(bytes,0,bytes.length);
     }
+
+    //file로 가져오는 경우
+    public void process(String path){
+
+        capturedImage = BitmapFactory.decodeFile(path);
+    }
+
+    //stream을 통해 데이터가 넘어오는 경우
+    public void process(InputStream is){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        capturedImage = BitmapFactory.decodeStream(is,null,options);
+    }
+
+    public Bitmap getCapturedImage() {
+        return capturedImage;
+    }
+
 }
