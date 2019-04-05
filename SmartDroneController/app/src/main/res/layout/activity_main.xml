@@ -24,7 +24,7 @@
 
         <view
             android:id="@+id/right_joystick"
-            class="kr.ac.hansung.deng.activity.RightJoystickView"
+            class="kr.ac.hansung.deng.view.RightJoystickView"
             id="@+id/view_right"
             layout_width="match_parent"
             android:layout_width="175dp"
@@ -35,7 +35,7 @@
 
         <view
             android:id="@+id/left_joystick"
-            class="kr.ac.hansung.deng.activity.LeftJoystickView"
+            class="kr.ac.hansung.deng.view.LeftJoystickView"
             id="@+id/view_left"
             layout_width="match_parent"
             android:layout_width="175dp"

@@ -1,4 +1,4 @@
-package kr.ac.hansung.deng.activity;
+package kr.ac.hansung.deng.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,6 +8,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import kr.ac.hansung.deng.app.MainActivity;
+import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
 
 /**
  * Created by khb on 2019-04-04.
@@ -46,18 +49,25 @@ public class LeftJoystickView extends View implements Runnable {
     private int lastAngle = 0;
     private int lastPower = 0;
 
+    private Context context;
+    // SDK Manager
+    private DroneSDKManager sdkManager;
+
     public LeftJoystickView(Context context) {
         super(context);
+        this.context = context;
         initJoystickView();
     }
 
     public LeftJoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
         initJoystickView();
     }
 
     public LeftJoystickView(Context context, AttributeSet attrs, int defaultStyle) {
         super(context, attrs, defaultStyle);
+        this.context = context;
         initJoystickView();
     }
 
@@ -81,6 +91,8 @@ public class LeftJoystickView extends View implements Runnable {
         button = new Paint(Paint.ANTI_ALIAS_FLAG);
         button.setColor(Color.RED);
         button.setStyle(Paint.Style.FILL);
+
+
     }
 
     @Override
@@ -292,22 +304,22 @@ public class LeftJoystickView extends View implements Runnable {
 
     // 왼쪽 조이스틱 sdk와 연결
     public void mappingWithSDK(int degree){
-
+        sdkManager = ((MainActivity)context).getSdkManager();
         if(degree > 45 && degree <135){
             // up
-            Log.d(TAG, "up");
+            sdkManager.up();
         }
         else if((degree > 135 && degree < 180) || (degree > -180 && degree < -135)){
             // turnRight
-            Log.d(TAG, "turnRight");
+            sdkManager.turnRight();
         }
         else if(degree > -135 && degree < -45){
             //down
-            Log.d(TAG, "down");
+            sdkManager.down();
         }
         else if((degree > -45 && degree < 0) || (degree > 0 && degree < 45)) {
             // turnLeft
-            Log.d(TAG, "turnLeft");
+            sdkManager.turnLeft();
         }
         else{
             //선에 걸쳐 있을 때 아무 동작 하지 않는다

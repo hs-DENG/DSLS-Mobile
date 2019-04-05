@@ -1,4 +1,4 @@
-package kr.ac.hansung.deng.activity;
+package kr.ac.hansung.deng.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,6 +8,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import kr.ac.hansung.deng.app.CustomDroneSDKManager;
+import kr.ac.hansung.deng.app.MainActivity;
+import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
 
 /**
  * Created by khb on 2019-04-04.
@@ -46,18 +50,24 @@ public class RightJoystickView extends View implements Runnable {
     private int lastAngle = 0;
     private int lastPower = 0;
 
+    private Context context;
+    private DroneSDKManager sdkManager;
+
     public RightJoystickView(Context context) {
         super(context);
+        this.context = context;
         initJoystickView();
     }
 
     public RightJoystickView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
         initJoystickView();
     }
 
     public RightJoystickView(Context context, AttributeSet attrs, int defaultStyle) {
         super(context, attrs, defaultStyle);
+        this.context = context;
         initJoystickView();
     }
 
@@ -292,22 +302,22 @@ public class RightJoystickView extends View implements Runnable {
 
     // 오른쪽 조이스틱 sdk와 연결
     public void mappingWithSDK(int degree){
-
+        sdkManager = (CustomDroneSDKManager)(((MainActivity)context).getSdkManager());
         if(degree > 45 && degree <135){
             // forward
-            Log.d(TAG, "forward");
+            sdkManager.forward();
         }
         else if(degree > 135 && degree <180 || degree > -180 && degree < -135){
             // right
-            Log.d(TAG, "right");
+            sdkManager.right();
         }
         else if(degree > -135 && degree <-45){
             //back
-            Log.d(TAG, "back");
+            sdkManager.back();
         }
         else{
             // left
-            Log.d(TAG, "left");
+            sdkManager.left();
         }
     }
 }

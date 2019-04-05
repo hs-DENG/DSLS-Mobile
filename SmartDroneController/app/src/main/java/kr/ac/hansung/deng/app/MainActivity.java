@@ -21,12 +21,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        boolean hing = false;
-        sdkManager = (DroneSDKManager) getIntent().getParcelableExtra("sdkManager");
+        sdkManager = getIntent().getParcelableExtra("sdkManager");
         if(sdkManager != null){
             // Main Activity 시작
             DroneInfoManager droneInfoManager = new DroneInfoManager();
-
 
         }
         else{
@@ -36,17 +34,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //take off button
-    public void onClickTakeOff(View view){
-        sdkManager.takeOffDrone();
-    }
+    public void onClickTakeOff(View view){ sdkManager.takeOff(); }
 
     //landing button
     public void onClickLanding(View view){
-        sdkManager.landingDrone();
+        sdkManager.landing();
     }
 
     //emergency button
     public void onClickEmergency(View view){
         //TODO Do Smart Landing
+    }
+
+
+    public DroneSDKManager getSdkManager() {
+        return sdkManager;
     }
 }

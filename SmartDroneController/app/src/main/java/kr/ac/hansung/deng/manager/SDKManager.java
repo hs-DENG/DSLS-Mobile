@@ -20,6 +20,6 @@ public interface SDKManager {
     void forward();
     void back();
 
-    void takeOffDrone();
-    void landingDrone();
+    void takeOff();
+    void landing();
 }

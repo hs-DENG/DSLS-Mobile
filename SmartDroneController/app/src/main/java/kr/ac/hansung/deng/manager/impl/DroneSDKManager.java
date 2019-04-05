@@ -92,12 +92,12 @@ public class DroneSDKManager implements SDKManager, Parcelable {
     }
 
     @Override
-    public void takeOffDrone() {
+    public void takeOff() {
 
     }
 
     @Override
-    public void landingDrone() {
+    public void landing() {
 
     }
 }
