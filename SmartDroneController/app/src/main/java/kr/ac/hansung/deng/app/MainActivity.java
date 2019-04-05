@@ -21,7 +21,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sdkManager = getIntent().getParcelableExtra("sdkManager");
+        Intent intent = getIntent();
+        sdkManager = (DroneSDKManager) intent.getSerializableExtra("sdkManager");
         if(sdkManager != null){
             // Main Activity 시작
             DroneInfoManager droneInfoManager = new DroneInfoManager();

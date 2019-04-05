@@ -302,7 +302,7 @@ public class RightJoystickView extends View implements Runnable {
 
     // 오른쪽 조이스틱 sdk와 연결
     public void mappingWithSDK(int degree){
-        sdkManager = (CustomDroneSDKManager)(((MainActivity)context).getSdkManager());
+        sdkManager = ((MainActivity)context).getSdkManager();
         if(degree > 45 && degree <135){
             // forward
             sdkManager.forward();

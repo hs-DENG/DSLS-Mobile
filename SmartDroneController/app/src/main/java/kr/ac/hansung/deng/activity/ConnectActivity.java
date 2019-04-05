@@ -30,7 +30,9 @@ public class ConnectActivity extends AppCompatActivity {
 
         // main activity로 연결
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("sdkManager", sdkManager);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("sdkManager", sdkManager);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 }

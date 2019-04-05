@@ -3,38 +3,18 @@ package kr.ac.hansung.deng.manager.impl;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 import kr.ac.hansung.deng.manager.SDKManager;
 
 
-public class DroneSDKManager implements SDKManager, Parcelable {
+public class DroneSDKManager implements SDKManager, Serializable {
     public DroneSDKManager(){}
 
     public DroneSDKManager(Parcel parcel){
         // field mapping
 
     }
-
-    public static final Parcelable.Creator<DroneSDKManager> CREATOR = new Parcelable.Creator<DroneSDKManager>() {
-        @Override
-        public DroneSDKManager createFromParcel(Parcel parcel) {
-            return new DroneSDKManager(parcel);
-        }
-        @Override
-        public DroneSDKManager[] newArray(int size) {
-            return new DroneSDKManager[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-
-    }
-
 
     @Override
     public void connect() {
