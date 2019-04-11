@@ -1,26 +1,101 @@
 package kr.ac.hansung.deng.app;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Parcel;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import dji.common.error.DJIError;
+import dji.common.error.DJISDKError;
+import dji.log.DJILog;
+import dji.sdk.base.BaseComponent;
+import dji.sdk.base.BaseProduct;
+import dji.sdk.sdkmanager.DJISDKManager;
 import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
 
-public class CustomDroneSDKManager extends DroneSDKManager {
+public class CustomDroneSDKManager extends DroneSDKManager{
 
-    public CustomDroneSDKManager(){}
+    private  Context mContext;
+    private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
+    private static final String TAG = "SDKManager";
 
-
-    public CustomDroneSDKManager(Parcel parcel) {
-        super(parcel);
+    public CustomDroneSDKManager(Context context){
+        mContext = context;
     }
 
     // connection
     @Override
     public void connect(){
-        Log.d("CustomDroneSDKManager","turn left signal!");
+        if (isRegistrationInProgress.compareAndSet(false, true)) {
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG,"registering, pls wait...");
+                    DJISDKManager.getInstance().registerApp(mContext, new DJISDKManager.SDKManagerCallback() {
+                        @Override
+                        public void onRegister(DJIError djiError) {
+                            if (djiError == DJISDKError.REGISTRATION_SUCCESS) {
+                                DJILog.e("App registration", DJISDKError.REGISTRATION_SUCCESS.getDescription());
+                                DJISDKManager.getInstance().startConnectionToProduct();
+                                Log.d(TAG,"Register Success ca");
+                            } else {
+                                Log.d(TAG, "Register sdk fails, check network is available");
+                            }
+                            Log.v(TAG, djiError.getDescription());
+                        }
+
+                        @Override
+                        public void onProductDisconnect() {
+                            Log.d(TAG, "onProductDisconnect");
+                            Log.d(TAG,"Product Disconnected");
+
+                        }
+                        @Override
+                        public void onProductConnect(BaseProduct baseProduct) {
+                            Log.d(TAG, String.format("onProductConnect newProduct:%s", baseProduct));
+                            Log.d(TAG,"Product Connected");
+
+                        }
+                        @Override
+                        public void onComponentChange(BaseProduct.ComponentKey componentKey, BaseComponent oldComponent,
+                                                      BaseComponent newComponent) {
+
+                            if (newComponent != null) {
+                                newComponent.setComponentListener(new BaseComponent.ComponentListener() {
+
+                                    @Override
+                                    public void onConnectivityChange(boolean isConnected) {
+                                        Log.d(TAG, "onComponentConnectivityChanged: " + isConnected);
+                                    }
+                                });
+                            }
+                            Log.d(TAG,
+                                    String.format("onComponentChange key:%s, oldComponent:%s, newComponent:%s",
+                                            componentKey,
+                                            oldComponent,
+                                            newComponent));
+
+                        }
+                    });
+                }
+            });
+        }
+        Log.d("CustomDroneSDKManager","connect signal!");
     }
 
+
+    public void startSDKRegistration() {
+
+    }
     // drone's function
     @Override
     public void getVideo(){

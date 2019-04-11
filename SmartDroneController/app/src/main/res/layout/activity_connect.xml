@@ -6,29 +6,12 @@
     android:layout_height="match_parent"
     android:background="#22FF99"
     android:orientation="vertical"
+    android:gravity="bottom"
     tools:context="kr.ac.hansung.deng.activity.ConnectActivity">
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btn_open"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="">
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom"
-        android:orientation="vertical">
-
-        <Button
-            android:id="@+id/connect_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:onClick="onConnect"
-            android:text="드론과 연결하기" />
-    </LinearLayout>
-
+        android:text="OPEN" />
 </LinearLayout>
