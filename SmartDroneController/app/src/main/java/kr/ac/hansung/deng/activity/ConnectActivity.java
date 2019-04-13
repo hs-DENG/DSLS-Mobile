@@ -57,6 +57,7 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sdkManager = new CustomDroneSDKManager(this);
         checkAndRequestPermissions();
         setContentView(R.layout.activity_connect);
 
@@ -66,7 +67,7 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
         IntentFilter filter = new IntentFilter();
         filter.addAction(FPVApplication.FLAG_CONNECTION_CHANGE);
         registerReceiver(mReceiver, filter);
-        sdkManager = new CustomDroneSDKManager(this);
+
 
     }
 
@@ -190,7 +191,7 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
         switch (v.getId()) {
 
             case R.id.btn_open: {
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("sdkManager", sdkManager);
                 intent.putExtras(bundle);

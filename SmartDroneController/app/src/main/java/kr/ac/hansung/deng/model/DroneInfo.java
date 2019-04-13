@@ -6,4 +6,9 @@ package kr.ac.hansung.deng.model;
 
 public class DroneInfo {
 
+    private DroneInfo instance = new DroneInfo();
+
+    public DroneInfo getInstance(){return instance;}
+
+    private DroneInfo(){}
 }

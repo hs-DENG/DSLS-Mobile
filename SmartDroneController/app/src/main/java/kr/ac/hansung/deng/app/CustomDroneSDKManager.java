@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,6 +20,8 @@ import dji.common.error.DJISDKError;
 import dji.log.DJILog;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.flightcontroller.FlightController;
+import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
 
@@ -27,7 +30,8 @@ public class CustomDroneSDKManager extends DroneSDKManager{
     private  Context mContext;
     private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
     private static final String TAG = "SDKManager";
-
+    private FlightController flightController;
+    //Aircraft aircraft = DJISimulatorApplication.getAircraftInstance();
     public CustomDroneSDKManager(Context context){
         mContext = context;
     }
@@ -83,7 +87,6 @@ public class CustomDroneSDKManager extends DroneSDKManager{
                                             componentKey,
                                             oldComponent,
                                             newComponent));
-
                         }
                     });
                 }
@@ -92,10 +95,6 @@ public class CustomDroneSDKManager extends DroneSDKManager{
         Log.d("CustomDroneSDKManager","connect signal!");
     }
 
-
-    public void startSDKRegistration() {
-
-    }
     // drone's function
     @Override
     public void getVideo(){

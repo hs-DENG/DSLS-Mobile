@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import kr.ac.hansung.deng.manager.DroneInfoManager;
+import kr.ac.hansung.deng.manager.EmergencyLandingManager;
 import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
 import kr.ac.hansung.deng.smartdronecontroller.R;
@@ -15,18 +16,22 @@ import kr.ac.hansung.deng.smartdronecontroller.R;
 public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
     private DroneSDKManager sdkManager;
+    private DroneInfoManager droneInfoManager;
+    private EmergencyLandingManager emergencyLandingManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         Intent intent = getIntent();
         sdkManager = (DroneSDKManager) intent.getSerializableExtra("sdkManager");
         if(sdkManager != null){
             // Main Activity 시작
-            DroneInfoManager droneInfoManager = new DroneInfoManager();
+            droneInfoManager = DroneInfoManager.getInstance();
+            droneInfoManager.init(sdkManager);
 
+            emergencyLandingManager = EmergencyLandingManager.getInstance();
+            emergencyLandingManager.init(sdkManager);
         }
         else{
             Toast.makeText(this, "from" + TAG + " error : SDK is Null", Toast.LENGTH_SHORT);
