@@ -16,4 +16,6 @@ public class DroneInfoManager {
 
 
     }
+    public void runService(){
+    }
 }

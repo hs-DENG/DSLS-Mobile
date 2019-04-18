@@ -4,8 +4,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -17,6 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
+import dji.common.util.CommonCallbacks;
 import dji.log.DJILog;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
@@ -24,17 +27,18 @@ import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
+import kr.ac.hansung.deng.sdk.DJISimulatorApplication;
 
 public class CustomDroneSDKManager extends DroneSDKManager{
 
-    private  Context mContext;
+    private static CustomDroneSDKManager instance = new CustomDroneSDKManager();
+    private Context mContext;
     private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
     private static final String TAG = "SDKManager";
     private FlightController flightController;
-    //Aircraft aircraft = DJISimulatorApplication.getAircraftInstance();
-    public CustomDroneSDKManager(Context context){
-        mContext = context;
-    }
+    private Aircraft aircraft;
+    private CustomDroneSDKManager(){}
+    public static CustomDroneSDKManager getInstance(){return instance;}
 
     // connection
     @Override
@@ -93,6 +97,13 @@ public class CustomDroneSDKManager extends DroneSDKManager{
             });
         }
         Log.d("CustomDroneSDKManager","connect signal!");
+        initController();
+
+    }
+
+    public void initController(){
+        aircraft = DJISimulatorApplication.getAircraftInstance();
+        flightController = aircraft.getFlightController();
     }
 
     // drone's function
@@ -143,11 +154,48 @@ public class CustomDroneSDKManager extends DroneSDKManager{
     }
     @Override
     public void takeOff(){
+        initController();
         Log.d("CustomDroneSDKManager","take-Off signal!");
+        if (flightController != null){
+            flightController.startTakeoff(
+                    new CommonCallbacks.CompletionCallback() {
+                        @Override
+                        public void onResult(DJIError djiError) {
+                            if (djiError != null) {
+                                Log.d(TAG,djiError.getDescription());
+                            } else {
+                                Log.d(TAG,"Take off Success");
+                            }
+                        }
+                    }
+            );
+        }
     }
     @Override
-    public void landing(){
-        Log.d("CustomDroneSDKManager","landing signal!");
+    public void landing() {
+        initController();
+        if (flightController != null) {
+            flightController.startLanding(
+                    new CommonCallbacks.CompletionCallback() {
+                        @Override
+                        public void onResult(DJIError djiError) {
+                            if (djiError != null) {
+                                Log.d(TAG, djiError.getDescription());
+                            } else {
+                                Log.d(TAG, "Start Landing");
+                            }
+                        }
+                    }
+            );
+            Log.d("CustomDroneSDKManager", "landing signal!");
+        }
     }
 
+    public Context getmContext() {
+        return mContext;
+    }
+
+    public void setContext(Context mContext) {
+        this.mContext = mContext;
+    }
 }

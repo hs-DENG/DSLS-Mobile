@@ -22,6 +22,24 @@
             android:onClick="onClickEmergency"
             android:text="비상 착륙" />
 
+        <Button
+            android:id="@+id/btn_takeoff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/btn_emergency"
+            android:onClick="onClickTakeoff"
+            android:text="이륙" />
+
+        <Button
+            android:id="@+id/btn_land"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/btn_takeoff"
+            android:onClick="onClickLand"
+            android:text="착륙" />
+
         <view
             android:id="@+id/right_joystick"
             class="kr.ac.hansung.deng.view.RightJoystickView"

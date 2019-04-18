@@ -15,7 +15,7 @@ import kr.ac.hansung.deng.smartdronecontroller.R;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
-    private DroneSDKManager sdkManager;
+    private CustomDroneSDKManager sdkManager;
     private DroneInfoManager droneInfoManager;
     private EmergencyLandingManager emergencyLandingManager;
 
@@ -24,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
-        sdkManager = (DroneSDKManager) intent.getSerializableExtra("sdkManager");
+        sdkManager = CustomDroneSDKManager.getInstance();
+        sdkManager.setContext(this);
         if(sdkManager != null){
             // Main Activity 시작
             droneInfoManager = DroneInfoManager.getInstance();
@@ -38,18 +39,17 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
     }
-
-    //take off button
-    public void onClickTakeOff(View view){ sdkManager.takeOff(); }
-
-    //landing button
-    public void onClickLanding(View view){
-        sdkManager.landing();
-    }
-
+    
     //emergency button
     public void onClickEmergency(View view){
         //TODO Do Smart Landing
+    }
+
+    public void onClickTakeoff(View view){
+        sdkManager.takeOff();
+    }
+    public void onClickLand(View view){
+        sdkManager.landing();
     }
 
 

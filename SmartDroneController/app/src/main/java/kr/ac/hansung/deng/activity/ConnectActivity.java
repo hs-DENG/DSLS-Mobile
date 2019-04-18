@@ -31,7 +31,7 @@ import kr.ac.hansung.deng.smartdronecontroller.R;
 public class ConnectActivity extends Activity implements View.OnClickListener{
     private static final String TAG = ConnectActivity.class.getName();
 
-    private DroneSDKManager sdkManager;
+    private CustomDroneSDKManager sdkManager;
 
     private Button mBtnOpen;
 
@@ -57,7 +57,8 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sdkManager = new CustomDroneSDKManager(this);
+        sdkManager =CustomDroneSDKManager.getInstance();
+        sdkManager.setContext(this);
         checkAndRequestPermissions();
         setContentView(R.layout.activity_connect);
 
@@ -147,7 +148,8 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
 
         mBtnOpen = (Button) findViewById(R.id.btn_open);
         mBtnOpen.setOnClickListener(this);
-        mBtnOpen.setEnabled(false);
+        mBtnOpen.setEnabled(false
+        );
     }
 
     protected BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -192,9 +194,9 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
 
             case R.id.btn_open: {
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("sdkManager", sdkManager);
-                intent.putExtras(bundle);
+//                Bundle bundle = new Bundle();
+//                bundle.putSerializable("sdkManager", sdkManager);
+//                intent.putExtras(bundle);
                 startActivity(intent);
                 break;
             }
