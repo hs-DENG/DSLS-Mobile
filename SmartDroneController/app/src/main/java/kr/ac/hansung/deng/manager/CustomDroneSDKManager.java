@@ -1,26 +1,36 @@
 package kr.ac.hansung.deng.manager;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
+import android.view.TextureView;
 
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import dji.common.camera.SettingsDefinitions;
+import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
 import dji.common.flightcontroller.virtualstick.FlightControlData;
+import dji.common.product.Model;
 import dji.common.util.CommonCallbacks;
 import dji.log.DJILog;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.camera.Camera;
+import dji.sdk.camera.VideoFeeder;
+import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 import kr.ac.hansung.deng.sdk.DJISimulatorApplication;
+import kr.ac.hansung.deng.sdk.FPVApplication;
 
-public class CustomDroneSDKManager implements SDKManager{
+public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTextureListener {
     // TAG
     private static final String TAG = "SDKManager";
 
@@ -44,6 +54,15 @@ public class CustomDroneSDKManager implements SDKManager{
     float mRoll;
     float mYaw;
     float mThrottle;
+
+    // Codec for video live view
+    protected DJICodecManager mCodecManager = null;
+    protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
+    protected Camera camera;
+    private TextureView myVideoSurface = null;
+    private Handler handler;
+    private Thread mThread = null;
+    private boolean initFlag = false;
 
     // connection
     @Override
@@ -128,15 +147,123 @@ public class CustomDroneSDKManager implements SDKManager{
     }
     // drone's function
     @Override
-    public void getVideo(){
-        Log.d("CustomDroneSDKManager","turn left signal!");
+    public void getVideo(TextureView textureView){
+        Log.d("CustomDroneSDKManager","get video signal!");
+        myVideoSurface = textureView;
+        mReceivedVideoDataListener = new VideoFeeder.VideoDataListener() {
+
+            @Override
+            public void onReceive(byte[] videoBuffer, int size) {
+                if (mCodecManager != null) {
+                    mCodecManager.sendDataToDecoder(videoBuffer, size);
+                }
+            }
+        };
+
+        camera = FPVApplication.getCameraInstance();
+
+        if(mThread == null){
+            mThread = new Thread("My Thread"){
+                @Override
+                public void run(){
+
+                    while(true){
+                        Log.d(TAG, "myVideoSurface is " + myVideoSurface);
+                        if(myVideoSurface != null) {
+                            Log.d(TAG, "1");
+                            // The callback for receiving the raw H264 video data for camera live view
+                            if(!initFlag){
+                                Log.d(TAG, "2");
+                                initPreviewer();
+                                initFlag = true;
+                            }
+                            if (camera != null) {
+
+                                camera.setSystemStateCallback(new SystemState.Callback() {
+                                    @Override
+                                    public void onUpdate(SystemState cameraSystemState) {
+                                        if (null != cameraSystemState) {
+
+                                            int recordTime = cameraSystemState.getCurrentVideoRecordingTimeInSeconds();
+                                            int minutes = (recordTime % 3600) / 60;
+                                            int seconds = recordTime % 60;
+
+                                        }
+                                    }
+                                });
+
+                            }
+
+
+                        }
+                    }
+                }
+            };
+            mThread.start();
+        }
+    }
+    private void initPreviewer(){
+        Log.d(TAG, "initPreviewer() 시작");
+
+        BaseProduct product = FPVApplication.getProductInstance();
+
+        if(product == null || !product.isConnected()){
+            //showToast(getString(R.string.disconnected));
+            Log.d(TAG, "if 들어옴");
+        }else {
+            Log.d(TAG, "else 들어옴");
+            if(myVideoSurface != null){
+                myVideoSurface.setSurfaceTextureListener(this);
+            }
+            if(!product.getModel().equals(Model.UNKNOWN_AIRCRAFT)){
+                Log.d(TAG, "else 리스너 ");
+                VideoFeeder.getInstance().getPrimaryVideoFeed().addVideoDataListener(mReceivedVideoDataListener);
+            }
+        }
+    }
+    @Override
+    public void removeVideo(){
+        Log.d("CustomDroneSDKManager","removeVideo() signal!");
+        Camera camera = FPVApplication.getCameraInstance();
+        if(camera != null){
+            //Reset the callback
+            VideoFeeder.getInstance().getPrimaryVideoFeed().addVideoDataListener(null);
+        }
     }
 
     @Override
     public void getCapture(){
-        Log.d("CustomDroneSDKManager","turn left signal!");
-    }
+        Log.d("CustomDroneSDKManager","getCapture() signal!");
 
+        handler = new Handler();
+        final Camera camera = FPVApplication.getCameraInstance();
+        if (camera != null) {
+
+            SettingsDefinitions.ShootPhotoMode photoMode = SettingsDefinitions.ShootPhotoMode.SINGLE; // Set the camera capture mode as Single mode
+            camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback(){
+                @Override
+                public void onResult(DJIError djiError) {
+                    if (null == djiError) {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                camera.startShootPhoto(new CommonCallbacks.CompletionCallback() {
+                                    @Override
+                                    public void onResult(DJIError djiError) {
+                                        if (djiError == null) {
+                                            Log.d("CustomDroneSDKManager","take photo: success");
+                                        } else {
+                                            Log.d("djiError!",djiError.toString());
+                                        }
+                                    }
+                                });
+                            }
+                        }, 2000);
+                    }
+                }
+            });
+        }
+    }
     // left joystick
     @Override
     public void turnLeft(float xPosition, float yPosition){
@@ -266,6 +393,27 @@ public class CustomDroneSDKManager implements SDKManager{
     public void setContext(Context mContext) {
         this.mContext = mContext;
     }
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+    }
+
     class SendVirtualStickDataTask extends TimerTask {
         @Override
         public void run() {

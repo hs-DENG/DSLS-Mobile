@@ -1,11 +1,14 @@
 package kr.ac.hansung.deng.manager;
 
+import android.view.TextureView;
+
 public interface SDKManager {
     // connection
     void connect();
 
     // drone's function
-    void getVideo();
+    void getVideo(TextureView textureView);
+    void removeVideo();
     void getCapture();
 
     // left joystick
