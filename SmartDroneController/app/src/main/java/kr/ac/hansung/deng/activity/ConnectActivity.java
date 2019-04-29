@@ -22,10 +22,9 @@ import java.util.List;
 
 import dji.sdk.base.BaseProduct;
 import dji.sdk.products.Aircraft;
-import kr.ac.hansung.deng.app.CustomDroneSDKManager;
+import kr.ac.hansung.deng.manager.CustomDroneSDKManager;
 import kr.ac.hansung.deng.sdk.FPVApplication;
 import kr.ac.hansung.deng.app.MainActivity;
-import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 
 public class ConnectActivity extends Activity implements View.OnClickListener{

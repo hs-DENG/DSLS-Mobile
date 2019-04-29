@@ -1,8 +1,6 @@
 package kr.ac.hansung.deng.manager;
 
 
-import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
-import kr.ac.hansung.deng.service.DroneInfoService;
 import kr.ac.hansung.deng.service.EmergencyService;
 
 public class EmergencyLandingManager{
@@ -13,9 +11,9 @@ public class EmergencyLandingManager{
 
     private EmergencyService emergencyService;
 
-    private DroneSDKManager sdkManager;
+    private CustomDroneSDKManager sdkManager;
 
-    public void init(DroneSDKManager sdkManager){
+    public void init(CustomDroneSDKManager sdkManager){
         this.sdkManager = sdkManager;
 
 

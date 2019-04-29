@@ -10,7 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import kr.ac.hansung.deng.app.MainActivity;
-import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
+import kr.ac.hansung.deng.manager.CustomDroneSDKManager;
 
 /**
  * Created by khb on 2019-04-04.
@@ -35,8 +35,8 @@ public class LeftJoystickView extends View implements Runnable {
     private OnJoystickMoveListener onJoystickMoveListener; // Listener
     private Thread thread = new Thread(this);
     private long loopInterval = DEFAULT_LOOP_INTERVAL;
-    private int xPosition = 0; // Touch x position
-    private int yPosition = 0; // Touch y position
+    private float xPosition = 0; // Touch x position
+    private float yPosition = 0; // Touch y position
     private double centerX = 0; // Center view x position
     private double centerY = 0; // Center view y position
     private Paint mainCircle;
@@ -51,7 +51,7 @@ public class LeftJoystickView extends View implements Runnable {
 
     private Context context;
     // SDK Manager
-    private DroneSDKManager sdkManager;
+    private CustomDroneSDKManager sdkManager;
 
     public LeftJoystickView(Context context) {
         super(context);
@@ -171,8 +171,8 @@ public class LeftJoystickView extends View implements Runnable {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        xPosition = (int) event.getX();
-        yPosition = (int) event.getY();
+        xPosition = event.getX();
+        yPosition = event.getY();
         double abs = Math.sqrt((xPosition - centerX) * (xPosition - centerX)
                 + (yPosition - centerY) * (yPosition - centerY));
         if (abs > joystickRadius) {
@@ -204,7 +204,7 @@ public class LeftJoystickView extends View implements Runnable {
 
         int degree = (int)(Math.toDegrees(Math.atan2(centerY - event.getY(), centerX - event.getX())));
         //Log.d(TAG, "각도 : " + degree);
-        mappingWithSDK(degree);
+        mappingWithSDK(degree,xPosition,yPosition);
         return true;
     }
 
@@ -303,23 +303,27 @@ public class LeftJoystickView extends View implements Runnable {
     }
 
     // 왼쪽 조이스틱 sdk와 연결
-    public void mappingWithSDK(int degree){
+    public void mappingWithSDK(int degree,float xPosition, float yPosition){
         sdkManager = ((MainActivity)context).getSdkManager();
+        if(!sdkManager.isConnect()){
+            sdkManager.initController();
+        }
         if(degree > 45 && degree <135){
             // up
-            sdkManager.up();
+            sdkManager.up(xPosition,yPosition);
         }
         else if((degree > 135 && degree < 180) || (degree > -180 && degree < -135)){
             // turnRight
-            sdkManager.turnRight();
+
+            sdkManager.turnRight(xPosition,yPosition);
         }
         else if(degree > -135 && degree < -45){
             //down
-            sdkManager.down();
+            sdkManager.down(xPosition,yPosition);
         }
         else if((degree > -45 && degree < 0) || (degree > 0 && degree < 45)) {
             // turnLeft
-            sdkManager.turnLeft();
+            sdkManager.turnLeft(xPosition,yPosition);
         }
         else{
             //선에 걸쳐 있을 때 아무 동작 하지 않는다

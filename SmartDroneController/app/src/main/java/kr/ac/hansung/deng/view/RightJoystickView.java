@@ -9,9 +9,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import kr.ac.hansung.deng.app.CustomDroneSDKManager;
 import kr.ac.hansung.deng.app.MainActivity;
-import kr.ac.hansung.deng.manager.impl.DroneSDKManager;
+import kr.ac.hansung.deng.manager.CustomDroneSDKManager;
 
 /**
  * Created by khb on 2019-04-04.
@@ -51,7 +50,7 @@ public class RightJoystickView extends View implements Runnable {
     private int lastPower = 0;
 
     private Context context;
-    private DroneSDKManager sdkManager;
+    private CustomDroneSDKManager sdkManager;
 
     public RightJoystickView(Context context) {
         super(context);
@@ -202,7 +201,7 @@ public class RightJoystickView extends View implements Runnable {
 
         int degree = (int)(Math.toDegrees(Math.atan2(centerY - event.getY(), centerX - event.getX())));
         //Log.d(TAG, "각도 : " + degree);
-        mappingWithSDK(degree);
+        mappingWithSDK(degree, xPosition, yPosition);
         return true;
     }
 
@@ -301,23 +300,23 @@ public class RightJoystickView extends View implements Runnable {
     }
 
     // 오른쪽 조이스틱 sdk와 연결
-    public void mappingWithSDK(int degree){
+    public void mappingWithSDK(int degree, float xPosition, float yPosition){
         sdkManager = ((MainActivity)context).getSdkManager();
         if(degree > 45 && degree <135){
             // forward
-            sdkManager.forward();
+            sdkManager.forward(xPosition, yPosition);
         }
         else if(degree > 135 && degree <180 || degree > -180 && degree < -135){
             // right
-            sdkManager.right();
+            sdkManager.right(xPosition, yPosition);
         }
         else if(degree > -135 && degree <-45){
             //back
-            sdkManager.back();
+            sdkManager.back(xPosition, yPosition);
         }
         else{
             // left
-            sdkManager.left();
+            sdkManager.left(xPosition, yPosition);
         }
     }
 }

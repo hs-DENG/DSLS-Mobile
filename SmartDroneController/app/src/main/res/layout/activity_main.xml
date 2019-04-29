@@ -12,7 +12,12 @@
         android:layout_height="match_parent"
         android:layout_weight="5"
         android:orientation="vertical">
-
+        <TextureView
+            android:id="@+id/video_previewer_surface"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"/>
         <Button
             android:id="@+id/btn_emergency"
             android:layout_width="wrap_content"
