@@ -1,5 +1,6 @@
 package kr.ac.hansung.deng.manager;
 
+import android.os.Handler;
 import android.view.TextureView;
 
 public interface SDKManager {
@@ -9,7 +10,7 @@ public interface SDKManager {
     // drone's function
     void getVideo(TextureView textureView);
     void removeVideo();
-    void getCapture();
+    void getCapture(TextureView textureView);
 
     // left joystick
     void turnLeft(float xPosition, float yPosition);

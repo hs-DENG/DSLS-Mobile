@@ -2,6 +2,7 @@ package kr.ac.hansung.deng.app;
 
 import android.content.Intent;
 import android.graphics.SurfaceTexture;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,15 +35,17 @@ public class MainActivity extends AppCompatActivity{
 
     protected TextureView mVideoSurface = null;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
+
         Intent intent = getIntent();
         sdkManager = CustomDroneSDKManager.getInstance();
         sdkManager.setContext(this);
+
+        mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
+        Log.d(TAG, "mVideoSurface : " + mVideoSurface);
         if(sdkManager != null){
             // Main Activity 시작
             droneInfoManager = DroneInfoManager.getInstance();
@@ -106,6 +109,12 @@ public class MainActivity extends AppCompatActivity{
         sdkManager.landing();
     }
 
+    public void onClickCapture(View view){
+        if(mVideoSurface == null){
+            Log.d("MainActivity", "mVideoSurface is null");
+        }
+        sdkManager.getCapture(mVideoSurface);
+    }
 
     public CustomDroneSDKManager getSdkManager() {
         return sdkManager;

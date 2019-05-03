@@ -1,17 +1,23 @@
 package kr.ac.hansung.deng.manager;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.TextureView;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import dji.common.camera.SettingsDefinitions;
 import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
@@ -58,7 +64,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     // Codec for video live view
     protected DJICodecManager mCodecManager = null;
     protected VideoFeeder.VideoDataListener mReceivedVideoDataListener = null;
-    protected Camera camera;
+    //protected Camera camera;
     private TextureView myVideoSurface = null;
     private Handler handler;
     private Thread mThread = null;
@@ -123,6 +129,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
         Log.d("CustomDroneSDKManager","connect signal!");
         initController();
 
+
     }
 
     public void initController(){
@@ -160,23 +167,27 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
             }
         };
 
-        camera = FPVApplication.getCameraInstance();
+
 
         if(mThread == null){
             mThread = new Thread("My Thread"){
                 @Override
                 public void run(){
 
-                    while(true){
-                        Log.d(TAG, "myVideoSurface is " + myVideoSurface);
+                    while(!initFlag){
+                        //Log.d(TAG, "myVideoSurface is " + myVideoSurface);
                         if(myVideoSurface != null) {
-                            Log.d(TAG, "1");
+                            //Log.d(TAG, "1");
                             // The callback for receiving the raw H264 video data for camera live view
                             if(!initFlag){
                                 Log.d(TAG, "2");
+                                Log.d(TAG, "mVideoSurface : " + myVideoSurface);
                                 initPreviewer();
                                 initFlag = true;
                             }
+
+                            Camera camera = FPVApplication.getCameraInstance();
+
                             if (camera != null) {
 
                                 camera.setSystemStateCallback(new SystemState.Callback() {
@@ -232,14 +243,55 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     }
 
     @Override
-    public void getCapture(){
+    public void getCapture(TextureView textureView){
         Log.d("CustomDroneSDKManager","getCapture() signal!");
 
+        textureView.buildDrawingCache();
+        Bitmap captureView = textureView.getBitmap(textureView.getWidth(),textureView.getHeight());
+        //captureView.setHasAlpha(true);
+        FileOutputStream fos;
+
+        String strFolderPath = Environment.getExternalStorageDirectory() + "/Pictures/SDC";
+
+        File myFile = new File(strFolderPath);
+
+        if(!myFile.exists()) {
+            myFile.mkdirs();
+        }
+
+        String strFilePath = strFolderPath + "/" + System.currentTimeMillis() + ".png";
+        File fileCacheItem = new File(strFilePath);
+
+        try {
+            fos = new FileOutputStream(fileCacheItem);
+            captureView.compress(Bitmap.CompressFormat.PNG, 100, fos);
+
+            mContext.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                    Uri.parse("file://"+ strFilePath)));
+            Log.d("CustomDroneSDKManager","capture success");
+            Log.d("CustomDroneSDKManager", strFilePath);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        /*final Camera camera = FPVApplication.getCameraInstance();
+
         handler = new Handler();
-        final Camera camera = FPVApplication.getCameraInstance();
+
         if (camera != null) {
 
+            camera.setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO, new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError djiError) {
+                    if (djiError == null) {
+                        Log.d("CustomDroneSDKManager", "camera mode setting success!");
+                    }
+                }
+            });
+
             SettingsDefinitions.ShootPhotoMode photoMode = SettingsDefinitions.ShootPhotoMode.SINGLE; // Set the camera capture mode as Single mode
+
             camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback(){
                 @Override
                 public void onResult(DJIError djiError) {
@@ -252,8 +304,11 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
                                     public void onResult(DJIError djiError) {
                                         if (djiError == null) {
                                             Log.d("CustomDroneSDKManager","take photo: success");
+                                            Toast.makeText(mContext, "take photo : success", Toast.LENGTH_LONG);
+
                                         } else {
-                                            Log.d("djiError!",djiError.toString());
+                                            Log.d("CustomDroneSDKManager","djiError : " + djiError.getDescription());
+                                            Toast.makeText(mContext, "djiError : " + djiError, Toast.LENGTH_LONG);
                                         }
                                     }
                                 });
@@ -262,7 +317,12 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
                     }
                 }
             });
-        }
+        }*/
+
+
+
+
+
     }
     // left joystick
     @Override
@@ -396,16 +456,25 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-
+        Log.e(TAG, "onSurfaceTextureAvailable");
+        if (mCodecManager == null) {
+            mCodecManager = new DJICodecManager(mContext, surface, width, height);
+        }
     }
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
+        Log.e(TAG, "onSurfaceTextureSizeChanged");
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        Log.e(TAG,"onSurfaceTextureDestroyed");
+        if (mCodecManager != null) {
+            mCodecManager.cleanSurface();
+            mCodecManager = null;
+        }
+
         return false;
     }
 
@@ -440,5 +509,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void setConnect(boolean connect) {
         this.connect = connect;
     }
+
+
 }
 
