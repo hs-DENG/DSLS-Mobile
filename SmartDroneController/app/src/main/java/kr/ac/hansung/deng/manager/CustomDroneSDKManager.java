@@ -2,6 +2,8 @@ package kr.ac.hansung.deng.manager;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import java.util.Timer;
@@ -10,7 +12,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
+import dji.common.flightcontroller.ControlMode;
+import dji.common.flightcontroller.simulator.SimulatorState;
 import dji.common.flightcontroller.virtualstick.FlightControlData;
+import dji.common.flightcontroller.virtualstick.FlightCoordinateSystem;
+import dji.common.flightcontroller.virtualstick.RollPitchControlMode;
+import dji.common.flightcontroller.virtualstick.VerticalControlMode;
+import dji.common.flightcontroller.virtualstick.YawControlMode;
+import dji.common.gimbal.Rotation;
+import dji.common.gimbal.RotationMode;
 import dji.common.util.CommonCallbacks;
 import dji.log.DJILog;
 import dji.sdk.base.BaseComponent;
@@ -39,11 +49,11 @@ public class CustomDroneSDKManager implements SDKManager{
 
     // joystick reference
     private Timer mSendVirtualStickDataTimer;
-    private TimerTask mSendVirtualStickDataTask;
-    float mPitch;
-    float mRoll;
-    float mYaw;
-    float mThrottle;
+    private SendVirtualStickDataTask mSendVirtualStickDataTask;
+    float mPitch=0;
+    float mRoll=0;
+    float mYaw=0;
+    float mThrottle=0;
 
     // connection
     @Override
@@ -68,7 +78,6 @@ public class CustomDroneSDKManager implements SDKManager{
 
                         @Override
                         public void onProductDisconnect() {
-                            Log.d(TAG, "onProductDisconnect");
                             Log.d(TAG,"Product Disconnected");
 
                         }
@@ -109,18 +118,43 @@ public class CustomDroneSDKManager implements SDKManager{
     public void initController(){
         if(!connect) {
             aircraft = DJISimulatorApplication.getAircraftInstance();
-            flightController = aircraft.getFlightController();
+            flightController = aircraft.getFlightController();//TODO aircraft null일 경우 예외처리
             connect=true;
-            Log.d(TAG,"Controller Connect Success!");
+            Log.d("CustomDroneSDKManager","Controller Connect Success!");
             if(flightController!=null){
                 flightController.setVirtualStickModeEnabled(true, new CommonCallbacks.CompletionCallback() {
                     @Override
                     public void onResult(DJIError djiError) {
                         if (djiError != null){
-                            Log.d(TAG,djiError.getDescription().toString());
+                            Log.d("setVirtualStickMode", "error" + djiError.getDescription().toString());
                         }else{
-                            Log.d(TAG,"Enable Virtual Stick Success");
+                            Log.d("setVirtualStickMode","Enable Virtual Stick Success");
                         }
+                    }
+                });
+                flightController.setRollPitchControlMode(RollPitchControlMode.VELOCITY);
+                flightController.setYawControlMode(YawControlMode.ANGULAR_VELOCITY);
+                flightController.setVerticalControlMode(VerticalControlMode.VELOCITY);
+                flightController.setRollPitchCoordinateSystem(FlightCoordinateSystem.BODY);
+                flightController.getSimulator().setStateCallback(new SimulatorState.Callback() {
+                    @Override
+                    public void onUpdate(final SimulatorState stateData) {
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                String yaw = String.format("%.2f", stateData.getYaw());
+                                String pitch = String.format("%.2f", stateData.getPitch());
+                                String roll = String.format("%.2f", stateData.getRoll());
+                                String positionX = String.format("%.2f", stateData.getPositionX());
+                                String positionY = String.format("%.2f", stateData.getPositionY());
+                                String positionZ = String.format("%.2f", stateData.getPositionZ());
+
+                                Log.d("SimulatorsetCallback","Yaw : " + yaw + ", Pitch : " + pitch + ", Roll : " + roll + "\n" + ", PosX : " + positionX +
+                                        ", PosY : " + positionY +
+                                        ", PosZ : " + positionZ);
+                            }
+                        });
                     }
                 });
             }
@@ -129,6 +163,13 @@ public class CustomDroneSDKManager implements SDKManager{
     // drone's function
     @Override
     public void getVideo(){
+        initController();
+        aircraft.getGimbal().rotate( Rotation.class.cast(RotationMode.ABSOLUTE_ANGLE), new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+
+            }
+        });
         Log.d("CustomDroneSDKManager","turn left signal!");
     }
 
@@ -139,7 +180,7 @@ public class CustomDroneSDKManager implements SDKManager{
 
     // left joystick
     @Override
-    public void turnLeft(float xPosition, float yPosition){
+    public void leftJoystickAction(float xPosition, float yPosition){
         initController();
         if(Math.abs(xPosition) < 0.02 ){
             xPosition = 0;
@@ -148,6 +189,8 @@ public class CustomDroneSDKManager implements SDKManager{
         if(Math.abs(yPosition) < 0.02 ){
             yPosition = 0;
         }
+        xPosition /=1000;
+        yPosition /=1000;
         float pitchJoyControlMaxSpeed = 10;
         float rollJoyControlMaxSpeed = 10;
 
@@ -155,21 +198,19 @@ public class CustomDroneSDKManager implements SDKManager{
         mPitch = (float)(pitchJoyControlMaxSpeed * xPosition);
 
         mRoll = (float)(rollJoyControlMaxSpeed * yPosition);
-
+        Log.d("CustomDroneSDKManager", "mPitch " + mPitch + ", mRoll " + mRoll );
         if (null == mSendVirtualStickDataTimer) {
             mSendVirtualStickDataTask = new SendVirtualStickDataTask ();
             mSendVirtualStickDataTimer = new Timer();
             mSendVirtualStickDataTimer.schedule(mSendVirtualStickDataTask, 100, 200);
         }
-        mPitch=0;
-        mRoll=0;
-        mYaw=0;
-        mThrottle=0;
-        Log.d("CustomDroneSDKManager","turn left signal!");
+        Log.d("CustomDroneSDKManager","xPosition is : " + xPosition + ", yPosition is : " + yPosition);
+        Log.d("CustomDroneSDKManager","left joystick action signal!");
 
     }
+
     @Override
-    public void turnRight(float xPosition, float yPosition){
+    public void rightJoystickAction(float xPosition, float yPosition){
         initController();
         if(Math.abs(xPosition) < 0.02 ){
             xPosition = 0;
@@ -178,48 +219,24 @@ public class CustomDroneSDKManager implements SDKManager{
         if(Math.abs(yPosition) < 0.02 ){
             yPosition = 0;
         }
-        float pitchJoyControlMaxSpeed = 10;
-        float rollJoyControlMaxSpeed = 10;
+        xPosition /=1000;
+        yPosition /=1000;
+        float verticalJoyControlMaxSpeed = 2;
+        float yawJoyControlMaxSpeed = 30;
 
-
-        mPitch = (float)(pitchJoyControlMaxSpeed * xPosition);
-
-        mRoll = (float)(rollJoyControlMaxSpeed * yPosition);
-
+        mYaw = (float)(yawJoyControlMaxSpeed * xPosition);
+        mThrottle = (float)(verticalJoyControlMaxSpeed * yPosition);
+        Log.d("CustomDroneSDKManager", "mYaw " + mYaw + ", mThrottle " + mThrottle );
         if (null == mSendVirtualStickDataTimer) {
             mSendVirtualStickDataTask = new SendVirtualStickDataTask ();
             mSendVirtualStickDataTimer = new Timer();
-            mSendVirtualStickDataTimer.schedule(mSendVirtualStickDataTask, 100, 200);
+            mSendVirtualStickDataTimer.schedule(mSendVirtualStickDataTask, 0, 200);
 
         }
-        Log.d("CustomDroneSDKManager","turn right signal!");
-    }
-    @Override
-    public void up(float xPosition, float yPosition){
-        Log.d("CustomDroneSDKManager","up signal!");
-    }
-    @Override
-    public void down(float xPosition, float yPosition){
-        Log.d("CustomDroneSDKManager","down signal!");
+        Log.d("CustomDroneSDKManager","xPosition is : " + xPosition + ", yPosition is : " + yPosition);
+        Log.d("CustomDroneSDKManager","right joystick action signal!");
     }
 
-    //right joystick
-    @Override
-    public void right(float xPosition, float yPosition){
-        Log.d("CustomDroneSDKManager","right signal!");
-    }
-    @Override
-    public void left(float xPosition, float yPosition){
-        Log.d("CustomDroneSDKManager","left signal!");
-    }
-    @Override
-    public void forward(float xPosition, float yPosition){
-        Log.d("CustomDroneSDKManager","forward signal!");
-    }
-    @Override
-    public void back(float xPosition, float yPosition){
-        Log.d("CustomDroneSDKManager","back signal!");
-    }
     @Override
     public void takeOff(){
         initController();
@@ -266,21 +283,23 @@ public class CustomDroneSDKManager implements SDKManager{
     public void setContext(Context mContext) {
         this.mContext = mContext;
     }
+
     class SendVirtualStickDataTask extends TimerTask {
         @Override
         public void run() {
-
             if (flightController != null) {
-                flightController.sendVirtualStickFlightControlData(
-                        new FlightControlData(
-                                mPitch, mRoll, mYaw, mThrottle
-                        ), new CommonCallbacks.CompletionCallback() {
-                            @Override
-                            public void onResult(DJIError djiError) {
-
-                            }
+                FlightControlData flightControlData = new FlightControlData( mPitch, mRoll, mYaw, mThrottle);
+                //Log.d("SendDataTask","mPitch : " + mPitch + "mRoll : " + mRoll + "mYaw : " + mYaw + "mThrottle : " + mThrottle);
+                flightController.sendVirtualStickFlightControlData(flightControlData, new CommonCallbacks.CompletionCallback() {
+                    @Override
+                    public void onResult(DJIError djiError) {
+                        if (djiError != null) {
+                            Log.d(TAG, djiError.getDescription());
+                        } else {
+                            Log.d(TAG, "Send JoyStick Data Successed");
                         }
-                );
+                    }
+                });
             }
         }
     }

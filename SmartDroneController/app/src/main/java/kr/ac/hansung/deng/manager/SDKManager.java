@@ -9,16 +9,10 @@ public interface SDKManager {
     void getCapture();
 
     // left joystick
-    void turnLeft(float xPosition, float yPosition);
-    void turnRight(float xPosition, float yPosition);
-    void up(float xPosition, float yPosition);
-    void down(float xPosition, float yPosition);
+    void leftJoystickAction(float xPosition, float yPosition);
 
     //right joystick
-    void right(float xPosition, float yPosition);
-    void left(float xPosition, float yPosition);
-    void forward(float xPosition, float yPosition);
-    void back(float xPosition, float yPosition);
+    void rightJoystickAction(float xPosition, float yPosition);
 
     void takeOff();
     void landing();

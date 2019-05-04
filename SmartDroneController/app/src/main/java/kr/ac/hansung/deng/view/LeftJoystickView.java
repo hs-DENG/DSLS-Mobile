@@ -308,25 +308,26 @@ public class LeftJoystickView extends View implements Runnable {
         if(!sdkManager.isConnect()){
             sdkManager.initController();
         }
-        if(degree > 45 && degree <135){
-            // up
-            sdkManager.up(xPosition,yPosition);
-        }
-        else if((degree > 135 && degree < 180) || (degree > -180 && degree < -135)){
-            // turnRight
-
-            sdkManager.turnRight(xPosition,yPosition);
-        }
-        else if(degree > -135 && degree < -45){
-            //down
-            sdkManager.down(xPosition,yPosition);
-        }
-        else if((degree > -45 && degree < 0) || (degree > 0 && degree < 45)) {
-            // turnLeft
-            sdkManager.turnLeft(xPosition,yPosition);
-        }
-        else{
-            //선에 걸쳐 있을 때 아무 동작 하지 않는다
-        }
+        sdkManager.leftJoystickAction(xPosition,yPosition);
+//        if(degree > 45 && degree <135){
+//            // up
+//            sdkManager.up(xPosition,yPosition);
+//        }
+//        else if((degree > 135 && degree < 180) || (degree > -180 && degree < -135)){
+//            // turnRight
+//
+//            sdkManager.turnRight(xPosition,yPosition);
+//        }
+//        else if(degree > -135 && degree < -45){
+//            //down
+//            sdkManager.down(xPosition,yPosition);
+//        }
+//        else if((degree > -45 && degree < 0) || (degree > 0 && degree < 45)) {
+//            // turnLeft
+//            sdkManager.turnLeft(xPosition,yPosition);
+//        }
+//        else{
+//            //선에 걸쳐 있을 때 아무 동작 하지 않는다
+//        }
     }
 }

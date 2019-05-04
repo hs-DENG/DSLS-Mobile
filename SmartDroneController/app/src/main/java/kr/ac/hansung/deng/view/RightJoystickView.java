@@ -302,21 +302,25 @@ public class RightJoystickView extends View implements Runnable {
     // 오른쪽 조이스틱 sdk와 연결
     public void mappingWithSDK(int degree, float xPosition, float yPosition){
         sdkManager = ((MainActivity)context).getSdkManager();
-        if(degree > 45 && degree <135){
-            // forward
-            sdkManager.forward(xPosition, yPosition);
+        if(!sdkManager.isConnect()){
+            sdkManager.initController();
         }
-        else if(degree > 135 && degree <180 || degree > -180 && degree < -135){
-            // right
-            sdkManager.right(xPosition, yPosition);
-        }
-        else if(degree > -135 && degree <-45){
-            //back
-            sdkManager.back(xPosition, yPosition);
-        }
-        else{
-            // left
-            sdkManager.left(xPosition, yPosition);
-        }
+        sdkManager.rightJoystickAction(xPosition,yPosition);
+//        if(degree > 45 && degree <135){
+//            // forward
+//            sdkManager.forward(xPosition, yPosition);
+//        }
+//        else if(degree > 135 && degree <180 || degree > -180 && degree < -135){
+//            // right
+//            sdkManager.right(xPosition, yPosition);
+//        }
+//        else if(degree > -135 && degree <-45){
+//            //back
+//            sdkManager.back(xPosition, yPosition);
+//        }
+//        else{
+//            // left
+//            sdkManager.left(xPosition, yPosition);
+//        }
     }
 }
