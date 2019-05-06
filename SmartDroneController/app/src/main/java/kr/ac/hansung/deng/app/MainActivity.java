@@ -116,6 +116,14 @@ public class MainActivity extends AppCompatActivity{
         sdkManager.getCapture(mVideoSurface);
     }
 
+    public void onClickDown(View view){
+        sdkManager.moveGimbalDown();
+    }
+
+    public void onClickUp(View view){
+        sdkManager.moveGimbalUp();
+    }
+
     public CustomDroneSDKManager getSdkManager() {
         return sdkManager;
     }

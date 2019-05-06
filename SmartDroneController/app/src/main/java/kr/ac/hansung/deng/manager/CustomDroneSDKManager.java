@@ -22,8 +22,12 @@ import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
 import dji.common.flightcontroller.virtualstick.FlightControlData;
+import dji.common.gimbal.CapabilityKey;
+import dji.common.gimbal.Rotation;
+import dji.common.gimbal.RotationMode;
 import dji.common.product.Model;
 import dji.common.util.CommonCallbacks;
+import dji.common.util.DJIParamMinMaxCapability;
 import dji.log.DJILog;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
@@ -31,6 +35,7 @@ import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightController;
+import dji.sdk.gimbal.Gimbal;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 import kr.ac.hansung.deng.sdk.DJISimulatorApplication;
@@ -322,6 +327,56 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
 
 
 
+
+    }
+
+    // gimbal angle 17 (17*5=85)
+    @Override
+    public void moveGimbalDown() {
+
+        aircraft = DJISimulatorApplication.getAircraftInstance();
+        Gimbal gimbal = aircraft.getGimbal();
+        if(gimbal == null){
+            Log.d("CustomDroneSDKManager", "gimbal is null");
+            return;
+        }
+
+        Rotation.Builder builder = new Rotation.Builder().mode(RotationMode.RELATIVE_ANGLE).time(2);
+        builder.pitch(-17);
+
+        gimbal.rotate(builder.build(), new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if(djiError == null)
+                    Log.d("CustomDroneSDKManager", "gimbal rotate down 17");
+                else
+                    Log.d("CustomDroneSDKManager", "djiError : " + djiError.getDescription());
+            }
+        });
+    }
+
+    // gimbal angle 17 (17*5=85)
+    @Override
+    public void moveGimbalUp() {
+        aircraft = DJISimulatorApplication.getAircraftInstance();
+        Gimbal gimbal = aircraft.getGimbal();
+        if(gimbal == null){
+            Log.d("CustomDroneSDKManager", "gimbal is null");
+            return;
+        }
+
+        Rotation.Builder builder = new Rotation.Builder().mode(RotationMode.RELATIVE_ANGLE).time(2);
+        builder.pitch(17);
+        
+        gimbal.rotate(builder.build(), new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if(djiError == null)
+                    Log.d("CustomDroneSDKManager", "gimbal rotate up 17");
+                else
+                    Log.d("CustomDroneSDKManager", "djiError : " + djiError.getDescription());
+            }
+        });
 
     }
     // left joystick

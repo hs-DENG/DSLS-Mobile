@@ -11,6 +11,8 @@ public interface SDKManager {
     void getVideo(TextureView textureView);
     void removeVideo();
     void getCapture(TextureView textureView);
+    void moveGimbalDown();
+    void moveGimbalUp();
 
     // left joystick
     void turnLeft(float xPosition, float yPosition);
