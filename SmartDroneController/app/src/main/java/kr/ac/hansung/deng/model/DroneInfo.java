@@ -11,4 +11,6 @@ public class DroneInfo {
     public DroneInfo getInstance(){return instance;}
 
     private DroneInfo(){}
+
+
 }

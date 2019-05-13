@@ -74,6 +74,24 @@
             android:layout_alignStart="@+id/btn_emergency"
             android:onClick="onClickCapture"
             android:text="캡쳐" />
+
+        <Button
+            android:id="@+id/btn_gimbal_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/btn_capture"
+            android:onClick="onClickDown"
+            android:text="down" />
+
+        <Button
+            android:id="@+id/btn_gimbal_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/btn_gimbal_down"
+            android:layout_alignParentStart="true"
+            android:onClick="onClickUp"
+            android:text="up" />
     </RelativeLayout>
 
 </LinearLayout>
