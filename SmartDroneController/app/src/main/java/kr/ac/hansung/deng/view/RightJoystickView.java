@@ -201,7 +201,7 @@ public class RightJoystickView extends View implements Runnable {
 
         int degree = (int)(Math.toDegrees(Math.atan2(centerY - event.getY(), centerX - event.getX())));
         //Log.d(TAG, "각도 : " + degree);
-        mappingWithSDK(degree, xPosition, yPosition);
+        mappingWithSDK(degree,xPosition,yPosition);
         return true;
     }
 
@@ -305,22 +305,26 @@ public class RightJoystickView extends View implements Runnable {
         if(!sdkManager.isConnect()){
             sdkManager.initController();
         }
-        sdkManager.rightJoystickAction(xPosition,yPosition);
-//        if(degree > 45 && degree <135){
-//            // forward
-//            sdkManager.forward(xPosition, yPosition);
-//        }
-//        else if(degree > 135 && degree <180 || degree > -180 && degree < -135){
-//            // right
-//            sdkManager.right(xPosition, yPosition);
-//        }
-//        else if(degree > -135 && degree <-45){
-//            //back
-//            sdkManager.back(xPosition, yPosition);
-//        }
-//        else{
-//            // left
-//            sdkManager.left(xPosition, yPosition);
-//        }
+ //       sdkManager.rightJoystickAction(xPosition,yPosition);
+        xPosition /=1000;
+        yPosition /=1000;
+//        sdkManager.leftJoystickAction(xPosition,yPosition);
+        if(xPosition > 0.29 || xPosition < 0.23) {
+            if (yPosition > 0.29 || yPosition < 0.23) {
+                if (degree > 45 && degree < 135) {
+                    // forward
+                    sdkManager.forward();
+                } else if (degree > 135 && degree < 180 || degree > -180 && degree < -135) {
+                    // right
+                    sdkManager.right();
+                } else if (degree > -135 && degree < -45) {
+                    //back
+                    sdkManager.back();
+                } else {
+                    // left
+                    sdkManager.left();
+                }
+            }
+        }
     }
 }

@@ -13,10 +13,18 @@ public interface SDKManager {
     void getCapture(TextureView textureView);
 
     // left joystick
-    void leftJoystickAction(float xPosition, float yPosition);
+//    void leftJoystickAction(float xPosition, float yPosition);
+    void up();
+    void down();
+    void turnLeft();
+    void turnRight();
 
     //right joystick
-    void rightJoystickAction(float xPosition, float yPosition);
+ //   void rightJoystickAction(float xPosition, float yPosition);
+    void forward();
+    void back();
+    void left();
+    void right();
 
     void takeOff();
     void landing();

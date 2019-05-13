@@ -303,31 +303,33 @@ public class LeftJoystickView extends View implements Runnable {
     }
 
     // 왼쪽 조이스틱 sdk와 연결
-    public void mappingWithSDK(int degree,float xPosition, float yPosition){
+    public void mappingWithSDK(int degree, float xPosition, float yPosition){
         sdkManager = ((MainActivity)context).getSdkManager();
         if(!sdkManager.isConnect()){
             sdkManager.initController();
         }
-        sdkManager.leftJoystickAction(xPosition,yPosition);
-//        if(degree > 45 && degree <135){
-//            // up
-//            sdkManager.up(xPosition,yPosition);
-//        }
-//        else if((degree > 135 && degree < 180) || (degree > -180 && degree < -135)){
-//            // turnRight
-//
-//            sdkManager.turnRight(xPosition,yPosition);
-//        }
-//        else if(degree > -135 && degree < -45){
-//            //down
-//            sdkManager.down(xPosition,yPosition);
-//        }
-//        else if((degree > -45 && degree < 0) || (degree > 0 && degree < 45)) {
-//            // turnLeft
-//            sdkManager.turnLeft(xPosition,yPosition);
-//        }
-//        else{
-//            //선에 걸쳐 있을 때 아무 동작 하지 않는다
-//        }
+        xPosition /=1000;
+        yPosition /=1000;
+//        sdkManager.leftJoystickAction(xPosition,yPosition);
+        if(xPosition > 0.29 || xPosition < 0.23) {
+            if (yPosition > 0.29 || yPosition < 0.23) {
+                if (degree > 45 && degree < 135) {
+                    // up
+                    sdkManager.up();
+                } else if ((degree > 135 && degree < 180) || (degree > -180 && degree < -135)) {
+                    // turnRight
+
+                    sdkManager.turnRight();
+                } else if (degree > -135 && degree < -45) {
+                    //down
+                    sdkManager.down();
+                } else if ((degree > -45 && degree < 0) || (degree > 0 && degree < 45)) {
+                    // turnLeft
+                    sdkManager.turnLeft();
+                } else {
+                    //선에 걸쳐 있을 때 아무 동작 하지 않는다
+                }
+            }
+        }
     }
 }

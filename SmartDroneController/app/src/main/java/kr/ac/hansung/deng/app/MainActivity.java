@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity{
         Intent intent = getIntent();
         sdkManager = CustomDroneSDKManager.getInstance();
         sdkManager.setContext(this);
+        sdkManager.initController();
 
         mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
         Log.d(TAG, "mVideoSurface : " + mVideoSurface);
