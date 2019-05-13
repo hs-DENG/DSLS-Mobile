@@ -344,9 +344,6 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
         Log.d(TAG,"down signal");
     }
 
-
-    }
-
     // gimbal angle 17 (17*5=85)
     @Override
     public void moveGimbalDown() {
@@ -377,23 +374,25 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void moveGimbalUp() {
         aircraft = DJISimulatorApplication.getAircraftInstance();
         Gimbal gimbal = aircraft.getGimbal();
-        if(gimbal == null){
+        if (gimbal == null) {
             Log.d("CustomDroneSDKManager", "gimbal is null");
             return;
         }
 
         Rotation.Builder builder = new Rotation.Builder().mode(RotationMode.RELATIVE_ANGLE).time(2);
         builder.pitch(17);
-        
+
         gimbal.rotate(builder.build(), new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError djiError) {
-                if(djiError == null)
+                if (djiError == null)
                     Log.d("CustomDroneSDKManager", "gimbal rotate up 17");
                 else
                     Log.d("CustomDroneSDKManager", "djiError : " + djiError.getDescription());
             }
         });
+    }
+
     @Override
     public void turnLeft() {
         initController();
