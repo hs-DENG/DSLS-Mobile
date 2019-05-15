@@ -69,13 +69,15 @@ public class EmergencyService extends Service {
 //                                sleep(2000);
 //                                sdkManager.moveGimbalDown();
 //                            }
-                            sdkManager.up();
-                            sleep(3000);
-                            sdkManager.getGoHomeHeightInMeters();
+                            ((CustomDroneSDKManager)sdkManager).moveGimbalDownAll();
                             sleep(3000);
                             sdkManager.up();
                             sleep(3000);
-                            sdkManager.getGoHomeHeightInMeters();
+                            sdkManager.getAircraftHeight();
+                            sleep(3000);
+                            sdkManager.up();
+                            sleep(3000);
+                            sdkManager.getAircraftHeight();
 //                            sleep(3000);
 //                            sdkManager.down();
 //                            sleep(3000);

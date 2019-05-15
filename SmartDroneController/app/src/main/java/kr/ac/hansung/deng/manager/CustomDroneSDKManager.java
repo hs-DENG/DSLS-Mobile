@@ -40,7 +40,9 @@ import dji.common.gimbal.Rotation;
 import dji.common.gimbal.RotationMode;
 import dji.common.util.CommonCallbacks;
 import dji.common.util.DJIParamMinMaxCapability;
+import dji.keysdk.GimbalKey;
 import dji.log.DJILog;
+import dji.midware.data.model.P3.DataGimbalGetPushParams;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
@@ -371,6 +373,54 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
         });
     }
 
+    public void moveGimbalDownAll() {
+
+        //aircraft = DJISimulatorApplication.getAircraftInstance();
+        Gimbal gimbal = aircraft.getGimbal();
+        if(gimbal == null){
+            Log.d("CustomDroneSDKManager", "gimbal is null");
+            return;
+        }
+
+        Rotation.Builder builder = new Rotation.Builder().mode(RotationMode.RELATIVE_ANGLE).time(2);
+
+        Number minValue = ((DJIParamMinMaxCapability) (gimbal.getCapabilities().get(CapabilityKey.ADJUST_PITCH))).getMin();
+        builder.pitch(minValue.floatValue());
+
+        gimbal.rotate(builder.build(), new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if(djiError == null)
+                    Log.d("CustomDroneSDKManager", "gimbal rotate down all");
+                else
+                    Log.d("CustomDroneSDKManager", "djiError : " + djiError.getDescription());
+            }
+        });
+    }
+
+    public void moveGimbalUpAll() {
+
+        //aircraft = DJISimulatorApplication.getAircraftInstance();
+        Gimbal gimbal = aircraft.getGimbal();
+        if(gimbal == null){
+            Log.d("CustomDroneSDKManager", "gimbal is null");
+            return;
+        }
+
+        Rotation.Builder builder = new Rotation.Builder().mode(RotationMode.RELATIVE_ANGLE).time(2);
+        Number maxValue = ((DJIParamMinMaxCapability) (gimbal.getCapabilities().get(CapabilityKey.ADJUST_PITCH))).getMax();
+        builder.pitch(maxValue.floatValue());
+
+        gimbal.rotate(builder.build(), new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if(djiError == null)
+                    Log.d("CustomDroneSDKManager", "gimbal rotate up all");
+                else
+                    Log.d("CustomDroneSDKManager", "djiError : " + djiError.getDescription());
+            }
+        });
+    }
     // gimbal angle 17 (17*5=85)
     @Override
     public void moveGimbalUp() {
@@ -615,10 +665,10 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     }
 
     @Override
-    public void getGoHomeHeightInMeters(){
+    public void getAircraftHeight(){
 //        int height = flightController.getState().getGoHomeHeight();
-        float height2 = flightController.getState().getUltrasonicHeightInMeters();
-        Log.d(TAG, "height is : " + height2);
+        float height = flightController.getState().getUltrasonicHeightInMeters();
+        Log.d(TAG, "height is : " + height);
 //        flightController.getGoHomeHeightInMeters(new CommonCallbacks.CompletionCallbackWith<Integer>() {
 //            @Override
 //            public void onSuccess(Integer integer) {
@@ -642,10 +692,6 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
         return connect;
     }
 
-    public void setConnect(boolean connect) {
-        this.connect = connect;
-    }
-
     private class SendVirtualStickDataTask extends TimerTask {
 
         @Override
@@ -666,9 +712,5 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
 
     public Bitmap getCaptureView() {
         return captureView;
-    }
-
-    public void setCaptureView(Bitmap captureView) {
-        this.captureView = captureView;
     }
 }
