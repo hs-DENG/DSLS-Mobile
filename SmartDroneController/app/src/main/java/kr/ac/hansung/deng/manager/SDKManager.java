@@ -30,4 +30,6 @@ public interface SDKManager {
 
     void takeOff();
     void landing();
+
+    void getGoHomeHeightInMeters();
 }

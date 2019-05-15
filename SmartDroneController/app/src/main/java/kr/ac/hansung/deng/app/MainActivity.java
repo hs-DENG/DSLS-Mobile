@@ -23,6 +23,7 @@ import dji.sdk.useraccount.UserAccountManager;
 import kr.ac.hansung.deng.manager.CustomDroneSDKManager;
 import kr.ac.hansung.deng.manager.DroneInfoManager;
 import kr.ac.hansung.deng.manager.EmergencyLandingManager;
+import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.sdk.FPVApplication;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity{
 
             emergencyLandingManager = EmergencyLandingManager.getInstance();
             emergencyLandingManager.init(sdkManager);
+            emergencyLandingManager.setActivity(this);
         }
         else{
             Toast.makeText(this, "from" + TAG + " error : SDK is Null", Toast.LENGTH_SHORT);
@@ -94,13 +96,18 @@ public class MainActivity extends AppCompatActivity{
     protected void onDestroy() {
         Log.e(TAG, "onDestroy");
 
-        super.onDestroy();
+
         sdkManager.removeVideo();
+        if(emergencyLandingManager.getEmergencyService().getClassifier()!= null)
+            emergencyLandingManager.getEmergencyService().getClassifier().close();
+
+        super.onDestroy();
     }
 
     //emergency button
     public void onClickEmergency(View view){
         //TODO Do Smart Landing
+        emergencyLandingManager.runService();
     }
 
     public void onClickTakeoff(View view){

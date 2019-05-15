@@ -73,8 +73,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     // joystick reference
     private Timer sendVirtualStickDataTimer;
     private SendVirtualStickDataTask sendVirtualStickDataTask;
-    float mPitch=0; // 앞뒤
-    float mRoll=0; // 좌우
+    float mPitch=0; // 앞뒤 이동거리 오차범위 65~75cm
+    float mRoll=0; // 좌우 이동거리 오차범위 70~80cm
     float mYaw=0; // 회전
     float mThrottle=0; // 상하
 
@@ -86,6 +86,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     private Handler handler;
     private Thread mThread = null;
     private boolean initFlag = false;
+
+    private Bitmap captureView;
 
     // connection
     @Override
@@ -264,7 +266,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
         Log.d(TAG,"getCapture() signal!");
 
         textureView.buildDrawingCache();
-        Bitmap captureView = textureView.getBitmap(textureView.getWidth(),textureView.getHeight());
+        captureView = textureView.getBitmap(textureView.getWidth(),textureView.getHeight());
         //captureView.setHasAlpha(true);
         FileOutputStream fos;
 
@@ -613,6 +615,25 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     }
 
     @Override
+    public void getGoHomeHeightInMeters(){
+//        int height = flightController.getState().getGoHomeHeight();
+        float height2 = flightController.getState().getUltrasonicHeightInMeters();
+        Log.d(TAG, "height is : " + height2);
+//        flightController.getGoHomeHeightInMeters(new CommonCallbacks.CompletionCallbackWith<Integer>() {
+//            @Override
+//            public void onSuccess(Integer integer) {
+//                Log.d(TAG, "height is : " + integer);
+//            }
+//
+//            @Override
+//            public void onFailure(DJIError djiError) {
+//                Log.d(TAG, "error is " + djiError.getDescription());
+//            }
+//        });
+    }
+
+
+    @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
     }
@@ -640,5 +661,14 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
                     }
                 }});
         }
+    }
+
+
+    public Bitmap getCaptureView() {
+        return captureView;
+    }
+
+    public void setCaptureView(Bitmap captureView) {
+        this.captureView = captureView;
     }
 }

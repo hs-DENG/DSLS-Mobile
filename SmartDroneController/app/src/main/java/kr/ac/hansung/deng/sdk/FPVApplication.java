@@ -12,6 +12,9 @@ import android.widget.Toast;
 
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
+import dji.common.util.CommonCallbacks;
+import dji.logic.album.model.DJIAlbumDirInfo;
+import dji.midware.data.model.P3.DataFlycSetActiveResult;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
@@ -53,6 +56,7 @@ public class FPVApplication extends Application{
     public static synchronized BaseProduct getProductInstance() {
         if (null == mProduct) {
             mProduct = DJISDKManager.getInstance().getProduct();
+
         }
         return mProduct;
     }
