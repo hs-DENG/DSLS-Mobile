@@ -17,8 +17,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import org.tensorflow.lite.Interpreter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -215,20 +213,5 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
             }
         });
     }
-    /*// 드론 연결 시도 버튼
-    public void onOpen(View view){
-        // sdkManager로 드론과 연결 시도
-        //sdkManager.connect();
-
-        // main activity로 연결
-        *//*if(isConnected){
-            Intent intent = new Intent(this, MainActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("sdkManager", sdkManager);
-            intent.putExtras(bundle);
-            startActivity(intent);
-        }*//*
-
-    }*/
 
 }

@@ -21,6 +21,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import dji.common.camera.ResolutionAndFrameRate;
+import dji.common.camera.SettingsDefinitions;
 import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
@@ -46,14 +48,18 @@ import dji.midware.data.model.P3.DataGimbalGetPushParams;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
+import dji.sdk.camera.Capabilities;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.gimbal.Gimbal;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
+import kr.ac.hansung.deng.app.MainActivity;
 import kr.ac.hansung.deng.sdk.DJISimulatorApplication;
 import kr.ac.hansung.deng.sdk.FPVApplication;
+
+import static java.lang.Thread.sleep;
 
 public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTextureListener {
     // TAG
@@ -75,10 +81,10 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     // joystick reference
     private Timer sendVirtualStickDataTimer;
     private SendVirtualStickDataTask sendVirtualStickDataTask;
-    float mPitch=0; // ¾ÕµÚ ÀÌµ¿°Å¸® ¿ÀÂ÷¹üÀ§ 65~75cm
-    float mRoll=0; // ÁÂ¿ì ÀÌµ¿°Å¸® ¿ÀÂ÷¹üÀ§ 70~80cm
-    float mYaw=0; // È¸Àü
-    float mThrottle=0; // »óÇÏ
+    float mPitch=0; // ì•ë’¤ ì´ë™ê±°ë¦¬ ì˜¤ì°¨ë²”ìœ„ 65~75cm
+    float mRoll=0; // ì¢Œìš° ì´ë™ê±°ë¦¬ ì˜¤ì°¨ë²”ìœ„ 70~80cm
+    float mYaw=0; // íšŒì „
+    float mThrottle=0; // ìƒí•˜
 
     // Codec for video live view
     protected DJICodecManager mCodecManager = null;
@@ -151,9 +157,10 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     }
 
     public void initController(){
+        //showHeight();
         if(aircraft == null || flightController == null) {
             aircraft = DJISimulatorApplication.getAircraftInstance();
-            flightController = aircraft.getFlightController();//TODO aircraft nullÀÏ ¶§ Ã³¸® ÇØÁà¾ßÇÔ
+            flightController = aircraft.getFlightController();//TODO aircraft nullì¼ ë•Œ ì²˜ë¦¬ í•´ì¤˜ì•¼í•¨
             //       connect=true;
             Log.d(TAG, "Controller Connect Success!");
             if (flightController != null) {
@@ -192,13 +199,10 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
             }
         };
 
-
-
         if(mThread == null){
             mThread = new Thread("My Thread"){
                 @Override
                 public void run(){
-
                     while(!initFlag){
                         //Log.d(TAG, "myVideoSurface is " + myVideoSurface);
                         if(myVideoSurface != null) {
@@ -501,8 +505,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void forward() {
         mPitch = (float)0;
         mRoll = (float)1;
-        mYaw=0; // È¸Àü
-        mThrottle=0; // »óÇÏ
+        mYaw=0; // íšŒì „
+        mThrottle=0; // ìƒí•˜
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -525,8 +529,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void back() {
         mPitch = (float)0;
         mRoll = -(float)1;
-        mYaw=0; // È¸Àü
-        mThrottle=0; // »óÇÏ
+        mYaw=0; // íšŒì „
+        mThrottle=0; // ìƒí•˜
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -549,8 +553,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void left() {
         mPitch = -(float)1;
         mRoll = (float)0;
-        mYaw=0; // È¸Àü
-        mThrottle=0; // »óÇÏ
+        mYaw=0; // íšŒì „
+        mThrottle=0; // ìƒí•˜
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -573,8 +577,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void right() {
         mPitch = (float)1;
         mRoll = (float)0;
-        mYaw=0; // È¸Àü
-        mThrottle=0; // »óÇÏ
+        mYaw=0; // íšŒì „
+        mThrottle=0; // ìƒí•˜
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -614,7 +618,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     }
     @Override
     public void landing() {
-       // initController();
+        // initController();
         if (flightController != null) {
             flightController.startLanding(
                     new CommonCallbacks.CompletionCallback() {
@@ -665,23 +669,11 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     }
 
     @Override
-    public void getAircraftHeight(){
-//        int height = flightController.getState().getGoHomeHeight();
+    public float getAircraftHeight(){
         float height = flightController.getState().getUltrasonicHeightInMeters();
-        Log.d(TAG, "height is : " + height);
-//        flightController.getGoHomeHeightInMeters(new CommonCallbacks.CompletionCallbackWith<Integer>() {
-//            @Override
-//            public void onSuccess(Integer integer) {
-//                Log.d(TAG, "height is : " + integer);
-//            }
-//
-//            @Override
-//            public void onFailure(DJIError djiError) {
-//                Log.d(TAG, "error is " + djiError.getDescription());
-//            }
-//        });
+        Log.d(TAG, "Aircraft height is : " + height);
+        return height;
     }
-
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
@@ -712,5 +704,22 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
 
     public Bitmap getCaptureView() {
         return captureView;
+    }
+
+    public void showHeight() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        sleep(500);
+                        ((MainActivity) mContext).getHeightText().setText(Float.toString(getAircraftHeight()) + "M");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        thread.start();
     }
 }
