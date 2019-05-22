@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import dji.common.camera.SystemState;
@@ -27,12 +28,15 @@ import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.sdk.FPVApplication;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private final String TAG = MainActivity.class.getSimpleName();
     private CustomDroneSDKManager sdkManager;
     private DroneInfoManager droneInfoManager;
     private EmergencyLandingManager emergencyLandingManager;
     // Codec for video live view
+
+    // 방향키
+    private Button left, right, forward, back, up, down;
 
     protected TextureView mVideoSurface = null;
 
@@ -45,6 +49,8 @@ public class MainActivity extends AppCompatActivity{
         sdkManager = CustomDroneSDKManager.getInstance();
         sdkManager.setContext(this);
         sdkManager.initController();
+
+        initUI();
 
         mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
         Log.d(TAG, "mVideoSurface : " + mVideoSurface);
@@ -63,6 +69,55 @@ public class MainActivity extends AppCompatActivity{
         }
 
         sdkManager.getVideo(mVideoSurface);
+    }
+
+    public void initUI(){
+        Button up = (Button)findViewById(R.id.btn_up);
+        up.setOnClickListener(this);
+        Button down = (Button)findViewById(R.id.btn_down);
+        down.setOnClickListener(this);
+        Button left = (Button)findViewById(R.id.btn_left);
+        left.setOnClickListener(this);
+        Button right = (Button)findViewById(R.id.btn_right);
+        right.setOnClickListener(this);
+        Button forward = (Button)findViewById(R.id.btn_forward);
+        forward.setOnClickListener(this);
+        Button back = (Button)findViewById(R.id.btn_back);
+        back.setOnClickListener(this);
+    }
+    @Override
+    public void onClick(View v) {
+        if(sdkManager != null) {
+            switch (v.getId()) {
+
+                case R.id.btn_up: {
+                    sdkManager.up();
+                    break;
+                }
+                case R.id.btn_down: {
+                    sdkManager.down();
+                    break;
+                }
+                case R.id.btn_left: {
+                    sdkManager.left();
+                    break;
+                }
+                case R.id.btn_right: {
+                    sdkManager.right();
+                    break;
+                }
+                case R.id.btn_forward: {
+                    sdkManager.forward();
+                    break;
+                }
+                case R.id.btn_back: {
+                    sdkManager.back();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
     }
 
     @Override

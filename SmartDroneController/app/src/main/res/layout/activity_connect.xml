@@ -10,6 +10,12 @@
     tools:context="kr.ac.hansung.deng.activity.ConnectActivity">
 
     <Button
+        android:id="@+id/btn_reConnect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ReConnect" />
+
+    <Button
         android:id="@+id/btn_open"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

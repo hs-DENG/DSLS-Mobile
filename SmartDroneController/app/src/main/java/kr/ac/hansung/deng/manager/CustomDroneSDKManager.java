@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.TextureView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -94,60 +95,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     // connection
     @Override
     public void connect(){
-        if (isRegistrationInProgress.compareAndSet(false, true)) {
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG,"registering, pls wait...");
-                    DJISDKManager.getInstance().registerApp(mContext, new DJISDKManager.SDKManagerCallback() {
-                        @Override
-                        public void onRegister(DJIError djiError) {
-                            if (djiError == DJISDKError.REGISTRATION_SUCCESS) {
-                                DJILog.e("App registration", DJISDKError.REGISTRATION_SUCCESS.getDescription());
-                                DJISDKManager.getInstance().startConnectionToProduct();
-                                Log.d(TAG,"Register Success ca");
-                            } else {
-                                Log.d(TAG, "Register sdk fails, check network is available");
-                            }
-                            Log.v(TAG, djiError.getDescription());
-                        }
-
-                        @Override
-                        public void onProductDisconnect() {
-                            Log.d(TAG,"Product Disconnected");
-
-                        }
-                        @Override
-                        public void onProductConnect(BaseProduct baseProduct) {
-                            Log.d(TAG, String.format("onProductConnect newProduct:%s", baseProduct));
-                            Log.d(TAG,"Product Connected");
-
-                        }
-                        @Override
-                        public void onComponentChange(BaseProduct.ComponentKey componentKey, BaseComponent oldComponent,
-                                                      BaseComponent newComponent) {
-
-                            if (newComponent != null) {
-                                newComponent.setComponentListener(new BaseComponent.ComponentListener() {
-
-                                    @Override
-                                    public void onConnectivityChange(boolean isConnected) {
-                                        Log.d(TAG, "onComponentConnectivityChanged: " + isConnected);
-                                    }
-                                });
-                            }
-                            Log.d(TAG,
-                                    String.format("onComponentChange key:%s, oldComponent:%s, newComponent:%s",
-                                            componentKey,
-                                            oldComponent,
-                                            newComponent));
-                        }
-                    });
-                }
-            });
-        }
-        Log.d(TAG,"connect signal!");
-        initController();
+       //TODO ¿¬°á
+        Toast.makeText(mContext,"Trying Re Connect!!!",Toast.LENGTH_SHORT).show();
     }
 
     public void initController(){
@@ -296,57 +245,6 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
             e.printStackTrace();
         }
     }
-    // left joystick
-
-    @Override
-    public void up() {
-        initController();
-        mPitch=0;
-        mRoll=0;
-        mYaw = (float)0;
-        mThrottle = (float)0.3;
-//        if (null == sendVirtualStickDataTimer) {
-//            sendVirtualStickDataTask = new SendVirtualStickDataTask();
-//            sendVirtualStickDataTimer = new Timer();
-//            sendVirtualStickDataTimer.schedule(sendVirtualStickDataTask, 100, 200);
-//        }
-        flightController.sendVirtualStickFlightControlData(new FlightControlData(mPitch, mRoll, mYaw, mThrottle), new CommonCallbacks.CompletionCallback() {
-            @Override
-            public void onResult(DJIError djiError) {
-                if(djiError != null){
-                    Log.d(TAG,"send data error is : " + djiError.getDescription().toString());
-                }
-                else {
-                    Log.d(TAG,"send successed");
-                }
-            }});
-        Log.d(TAG,"up signal");
-    }
-
-    @Override
-    public void down() {
-        initController();
-        mPitch=0;
-        mRoll=0;
-        mYaw = (float)0;
-        mThrottle = -(float)0.3;
-//        if (null == sendVirtualStickDataTimer) {
-//            sendVirtualStickDataTask = new SendVirtualStickDataTask();
-//            sendVirtualStickDataTimer = new Timer();
-//            sendVirtualStickDataTimer.schedule(sendVirtualStickDataTask, 100, 200);
-//        }
-        flightController.sendVirtualStickFlightControlData(new FlightControlData(mPitch, mRoll, mYaw, mThrottle), new CommonCallbacks.CompletionCallback() {
-            @Override
-            public void onResult(DJIError djiError) {
-                if(djiError != null){
-                    Log.d(TAG,"send data error is : " + djiError.getDescription().toString());
-                }
-                else {
-                    Log.d(TAG,"send successed");
-                }
-            }});
-        Log.d(TAG,"down signal");
-    }
 
     // gimbal angle 17 (17*5=85)
     @Override
@@ -443,6 +341,56 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
                     Log.d("CustomDroneSDKManager", "djiError : " + djiError.getDescription());
             }
         });
+    }
+    // left joystick
+    @Override
+    public void up() {
+        initController();
+        mPitch=0;
+        mRoll=0;
+        mYaw = (float)0;
+        mThrottle = (float)0.3;
+//        if (null == sendVirtualStickDataTimer) {
+//            sendVirtualStickDataTask = new SendVirtualStickDataTask();
+//            sendVirtualStickDataTimer = new Timer();
+//            sendVirtualStickDataTimer.schedule(sendVirtualStickDataTask, 100, 200);
+//        }
+        flightController.sendVirtualStickFlightControlData(new FlightControlData(mPitch, mRoll, mYaw, mThrottle), new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if(djiError != null){
+                    Log.d(TAG,"send data error is : " + djiError.getDescription().toString());
+                }
+                else {
+                    Log.d(TAG,"send successed");
+                }
+            }});
+        Log.d(TAG,"up signal");
+    }
+
+    @Override
+    public void down() {
+        initController();
+        mPitch=0;
+        mRoll=0;
+        mYaw = (float)0;
+        mThrottle = -(float)0.3;
+//        if (null == sendVirtualStickDataTimer) {
+//            sendVirtualStickDataTask = new SendVirtualStickDataTask();
+//            sendVirtualStickDataTimer = new Timer();
+//            sendVirtualStickDataTimer.schedule(sendVirtualStickDataTask, 100, 200);
+//        }
+        flightController.sendVirtualStickFlightControlData(new FlightControlData(mPitch, mRoll, mYaw, mThrottle), new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError djiError) {
+                if(djiError != null){
+                    Log.d(TAG,"send data error is : " + djiError.getDescription().toString());
+                }
+                else {
+                    Log.d(TAG,"send successed");
+                }
+            }});
+        Log.d(TAG,"down signal");
     }
 
     @Override
@@ -665,21 +613,10 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     }
 
     @Override
-    public void getAircraftHeight(){
-//        int height = flightController.getState().getGoHomeHeight();
+    public float getAircraftHeight(){
         float height = flightController.getState().getUltrasonicHeightInMeters();
         Log.d(TAG, "height is : " + height);
-//        flightController.getGoHomeHeightInMeters(new CommonCallbacks.CompletionCallbackWith<Integer>() {
-//            @Override
-//            public void onSuccess(Integer integer) {
-//                Log.d(TAG, "height is : " + integer);
-//            }
-//
-//            @Override
-//            public void onFailure(DJIError djiError) {
-//                Log.d(TAG, "error is " + djiError.getDescription());
-//            }
-//        });
+        return height;
     }
 
 

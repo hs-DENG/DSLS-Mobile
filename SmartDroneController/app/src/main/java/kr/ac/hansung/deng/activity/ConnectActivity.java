@@ -35,7 +35,7 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
     private CustomDroneSDKManager sdkManager;
 
     private Button mBtnOpen;
-
+    private Button mBtnReConnect;
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.VIBRATE,
             Manifest.permission.INTERNET,
@@ -151,6 +151,8 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
         mBtnOpen.setOnClickListener(this);
         mBtnOpen.setEnabled(false
         );
+        mBtnReConnect = (Button)findViewById(R.id.btn_reConnect);
+        mBtnReConnect.setOnClickListener(this);
     }
 
     protected BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -200,6 +202,11 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
 //                intent.putExtras(bundle);
                 startActivity(intent);
                 break;
+            }
+            case R.id.btn_reConnect:{
+               // Toast.makeText(this,"Trying Re Connect",Toast.LENGTH_SHORT).show();
+               // Log.d("test","Trying Re Connect");
+                sdkManager.connect();
             }
             default:
                 break;
