@@ -5,11 +5,16 @@ import android.graphics.SurfaceTexture;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
@@ -33,9 +38,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private CustomDroneSDKManager sdkManager;
     private DroneInfoManager droneInfoManager;
     private EmergencyLandingManager emergencyLandingManager;
+    private RelativeLayout myLayout;
+    private TextView heightText;
     // Codec for video live view
 
-    // 방향키
+    // 방향
     private Button left, right, forward, back, up, down;
 
     protected TextureView mVideoSurface = null;
@@ -55,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
         Log.d(TAG, "mVideoSurface : " + mVideoSurface);
         if(sdkManager != null){
-            // Main Activity 시작
+            // Main Activity �작
             droneInfoManager = DroneInfoManager.getInstance();
             droneInfoManager.init(sdkManager);
 
@@ -87,6 +94,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     @Override
     public void onClick(View v) {
+
+        myLayout = (RelativeLayout) findViewById(R.id.myRelativeLayout);
+//        heightText = new TextView(this);
+//        heightText.setX(mVideoSurface.getWidth()/2);
+        Log.d("SDKManager", "mVideoSurface width = " + mVideoSurface.getWidth());
+        Log.d("Height", "height = " + mVideoSurface.getWidth()/2);
+        //heightText.setX(mVideoSurface.getWidth()/2);
+        heightText = (TextView)findViewById(R.id.height);
+        heightText.setText("Height textview");
+//        myLayout.addView(heightText);
+        sdkManager.showHeight();
+
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        //super.onWindowFocusChanged(hasFocus);
+
         if(sdkManager != null) {
             switch (v.getId()) {
 
@@ -191,4 +216,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return sdkManager;
     }
 
+    public TextView getHeightText() {
+        return heightText;
+    }
 }

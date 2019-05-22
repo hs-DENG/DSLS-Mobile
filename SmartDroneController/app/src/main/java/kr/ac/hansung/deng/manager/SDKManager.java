@@ -22,7 +22,7 @@ public interface SDKManager {
     void turnRight();
 
     //right joystick
- //   void rightJoystickAction(float xPosition, float yPosition);
+    //   void rightJoystickAction(float xPosition, float yPosition);
     void forward();
     void back();
     void left();

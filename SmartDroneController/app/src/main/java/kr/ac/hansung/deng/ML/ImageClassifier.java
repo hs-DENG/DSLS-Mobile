@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import kr.ac.hansung.deng.data.LabelProcess;
+
 public abstract class ImageClassifier {
 
     private static final float GOOD_PROB_THRESHOLD = 0.3f;
@@ -246,9 +248,12 @@ public abstract class ImageClassifier {
         }
 
         final int size = sortedLabels.size();
+        //TODO LabelProcess 사용해서 이용
+        //LabelProcess lp = new LabelProcess(this);
         for (int i = 0; i < size; i++) {
             label = sortedLabels.poll();
-            Log.d("ImageClassifier",String.format("%s: %4.2f\n", label.getKey(), label.getValue()));
+            Log.d("ImageClassifier",String.format("%s: %4.2f\n", label.getKey(), label.getValue())); //정확도 찍어주는 시점
+
 
         }
     }

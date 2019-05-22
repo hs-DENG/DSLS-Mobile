@@ -22,6 +22,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import dji.common.camera.ResolutionAndFrameRate;
+import dji.common.camera.SettingsDefinitions;
 import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
@@ -47,14 +49,18 @@ import dji.midware.data.model.P3.DataGimbalGetPushParams;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
+import dji.sdk.camera.Capabilities;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.gimbal.Gimbal;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
+import kr.ac.hansung.deng.app.MainActivity;
 import kr.ac.hansung.deng.sdk.DJISimulatorApplication;
 import kr.ac.hansung.deng.sdk.FPVApplication;
+
+import static java.lang.Thread.sleep;
 
 public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTextureListener {
     // TAG
@@ -76,10 +82,10 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     // joystick reference
     private Timer sendVirtualStickDataTimer;
     private SendVirtualStickDataTask sendVirtualStickDataTask;
-    float mPitch=0; // 앞뒤 이동거리 오차범위 65~75cm
-    float mRoll=0; // 좌우 이동거리 오차범위 70~80cm
-    float mYaw=0; // 회전
-    float mThrottle=0; // 상하
+    float mPitch=0; // 욌뮘 대룞嫄곕━ ㅼ감踰붿쐞 65~75cm
+    float mRoll=0; // 醫뚯슦 대룞嫄곕━ ㅼ감踰붿쐞 70~80cm
+    float mYaw=0; // 뚯쟾
+    float mThrottle=0; // 곹븯
 
     // Codec for video live view
     protected DJICodecManager mCodecManager = null;
@@ -100,9 +106,10 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     }
 
     public void initController(){
+        //showHeight();
         if(aircraft == null || flightController == null) {
             aircraft = DJISimulatorApplication.getAircraftInstance();
-            flightController = aircraft.getFlightController();//TODO aircraft null일 때 처리 해줘야함
+            flightController = aircraft.getFlightController();//TODO aircraft null泥섎━ 댁쨾쇳븿
             //       connect=true;
             Log.d(TAG, "Controller Connect Success!");
             if (flightController != null) {
@@ -141,13 +148,10 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
             }
         };
 
-
-
         if(mThread == null){
             mThread = new Thread("My Thread"){
                 @Override
                 public void run(){
-
                     while(!initFlag){
                         //Log.d(TAG, "myVideoSurface is " + myVideoSurface);
                         if(myVideoSurface != null) {
@@ -449,8 +453,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void forward() {
         mPitch = (float)0;
         mRoll = (float)1;
-        mYaw=0; // 회전
-        mThrottle=0; // 상하
+        mYaw=0; // 뚯쟾
+        mThrottle=0; // 곹븯
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -473,8 +477,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void back() {
         mPitch = (float)0;
         mRoll = -(float)1;
-        mYaw=0; // 회전
-        mThrottle=0; // 상하
+        mYaw=0; // 뚯쟾
+        mThrottle=0; // 곹븯
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -497,8 +501,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void left() {
         mPitch = -(float)1;
         mRoll = (float)0;
-        mYaw=0; // 회전
-        mThrottle=0; // 상하
+        mYaw=0; // 뚯쟾
+        mThrottle=0; // 곹븯
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -521,8 +525,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void right() {
         mPitch = (float)1;
         mRoll = (float)0;
-        mYaw=0; // 회전
-        mThrottle=0; // 상하
+        mYaw=0; // 뚯쟾
+        mThrottle=0; // 곹븯
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -562,7 +566,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     }
     @Override
     public void landing() {
-       // initController();
+        // initController();
         if (flightController != null) {
             flightController.startLanding(
                     new CommonCallbacks.CompletionCallback() {
@@ -615,10 +619,9 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     @Override
     public float getAircraftHeight(){
         float height = flightController.getState().getUltrasonicHeightInMeters();
-        Log.d(TAG, "height is : " + height);
+        Log.d(TAG, "Aircraft height is : " + height);
         return height;
     }
-
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
@@ -649,5 +652,22 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
 
     public Bitmap getCaptureView() {
         return captureView;
+    }
+
+    public void showHeight() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        sleep(500);
+                        ((MainActivity) mContext).getHeightText().setText(Float.toString(getAircraftHeight()) + "M");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        thread.start();
     }
 }
