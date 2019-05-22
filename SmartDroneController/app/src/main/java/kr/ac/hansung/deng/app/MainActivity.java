@@ -79,37 +79,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void initUI(){
-        Button up = (Button)findViewById(R.id.btn_up);
+        up = (Button)findViewById(R.id.btn_up);
         up.setOnClickListener(this);
-        Button down = (Button)findViewById(R.id.btn_down);
+        down = (Button)findViewById(R.id.btn_down);
         down.setOnClickListener(this);
-        Button left = (Button)findViewById(R.id.btn_left);
+        left = (Button)findViewById(R.id.btn_left);
         left.setOnClickListener(this);
-        Button right = (Button)findViewById(R.id.btn_right);
+        right = (Button)findViewById(R.id.btn_right);
         right.setOnClickListener(this);
-        Button forward = (Button)findViewById(R.id.btn_forward);
+        forward = (Button)findViewById(R.id.btn_forward);
         forward.setOnClickListener(this);
-        Button back = (Button)findViewById(R.id.btn_back);
+        back = (Button)findViewById(R.id.btn_back);
         back.setOnClickListener(this);
+        heightText = (TextView)findViewById(R.id.height);
     }
     @Override
     public void onClick(View v) {
-
-        myLayout = (RelativeLayout) findViewById(R.id.myRelativeLayout);
-//        heightText = new TextView(this);
-//        heightText.setX(mVideoSurface.getWidth()/2);
-        Log.d("SDKManager", "mVideoSurface width = " + mVideoSurface.getWidth());
-        Log.d("Height", "height = " + mVideoSurface.getWidth()/2);
-        //heightText.setX(mVideoSurface.getWidth()/2);
-        heightText = (TextView)findViewById(R.id.height);
-        heightText.setText("Height textview");
-//        myLayout.addView(heightText);
-        sdkManager.showHeight();
-
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
         //super.onWindowFocusChanged(hasFocus);
 
         if(sdkManager != null) {
