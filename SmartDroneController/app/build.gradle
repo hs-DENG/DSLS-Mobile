@@ -19,14 +19,14 @@ android {
         }
     }
 
-    lintOptions{
+    lintOptions {
         abortOnError false
     }
 
-    aaptOptions{
+    aaptOptions {
         noCompress "tflite"
     }
-    compileOptions{
+    compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
 
@@ -46,14 +46,14 @@ android {
     }
 }
 
-repositories{
-    maven{
+repositories {
+    maven {
         url "https://google.bintray.com/tensorflow"
     }
 }
 
-allprojects{
-    repositories{
+allprojects {
+    repositories {
         jcenter()
     }
 }
@@ -72,9 +72,9 @@ dependencies {
     compileOnly('com.dji:dji-sdk-provided:4.8.1')
 }
 
-def targetFolder ="src/main/assets"
+def targetFolder = "src/main/assets"
 
-task cleanUnusedFiles(type: Delete, dependsOn: ['unzipModelFloat','unzipModelQuant']) {
+task cleanUnusedFiles(type: Delete, dependsOn: ['unzipModelFloat', 'unzipModelQuant']) {
     delete fileTree("${targetFolder}").matching {
         include "*.pb"
         include "*.ckpt.*"
