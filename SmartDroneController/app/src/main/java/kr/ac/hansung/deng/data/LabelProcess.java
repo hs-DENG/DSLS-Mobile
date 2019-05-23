@@ -1,5 +1,6 @@
 package kr.ac.hansung.deng.data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -20,7 +21,7 @@ import kr.ac.hansung.deng.ML.ImageClassifier;
 
 public class LabelProcess {
     private final String TAG = "LabelProcess";
-    private List<Map.Entry<String,Float>> labelList;
+    private List<Map.Entry<String,Float>> labelList;//TODO row, cols
     private ImageClassifier mClassifier;
 
     public LabelProcess(ImageClassifier classifier){
@@ -29,7 +30,8 @@ public class LabelProcess {
 
     //safe, unsafe중 값이 더 큰 라벨을 저장
     //PriorityQueue를 array로 변환 후 처리
-    public void setLabelList(PriorityQueue<Map.Entry<String, Float>> sortedLabels){
+    public void setLabelList(PriorityQueue<Map.Entry<String, Float>> sortedLabels)
+    {
         Object [] sortedArray = sortedLabels.toArray();
         Map.Entry<String,Float> maxLabel = (Map.Entry<String,Float>)sortedArray[0];
         int size = sortedArray.length;
@@ -39,9 +41,9 @@ public class LabelProcess {
                 maxLabel = (Map.Entry<String,Float>)sortedArray[i];
             }
         }
+        labelList = new ArrayList<Map.Entry<String, Float>>();
         labelList.add(maxLabel);
     }
-
     public List<Map.Entry<String,Float>> getLabelList(){
         return labelList;
     }

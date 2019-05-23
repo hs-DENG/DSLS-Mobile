@@ -4,10 +4,12 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
 
@@ -15,7 +17,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 import kr.ac.hansung.deng.ML.ImageClassifier;
 import kr.ac.hansung.deng.ML.ImageClassifierFloatInception;
@@ -23,19 +30,28 @@ import kr.ac.hansung.deng.app.MainActivity;
 import kr.ac.hansung.deng.manager.CustomDroneSDKManager;
 import kr.ac.hansung.deng.manager.EmergencyLandingManager;
 import kr.ac.hansung.deng.manager.SDKManager;
+import kr.ac.hansung.deng.model.ImageLabelInfo;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 import kr.ac.hansung.deng.util.ImageDivide;
+
+import static java.lang.Thread.sleep;
 
 public class EmergencyService extends Service {
 
     private static final String TAG = EmergencyService.class.getSimpleName();
     private Thread mThread = null;
     private int mCount = 0;
-    private Bitmap bitmap1,testData;
+
+    // 학습 필드
+    private Bitmap testData;
+    private List<Bitmap> divededImages;
+    private List<Bitmap> processedImages;
     private ImageClassifier classifier;
     private MainActivity mainActivity;
     private SDKManager sdkManager;
 
+    // model
+    private List<ImageLabelInfo> labelInfoList = new ArrayList<ImageLabelInfo>();
     public EmergencyService() {
         sdkManager = CustomDroneSDKManager.getInstance();
     }
@@ -52,81 +68,88 @@ public class EmergencyService extends Service {
                     // 이미지 정보 받기 ( 드론 정보 서비스로부터)
                     // 캡쳐 이미지 모델에 돌리기
 
-                    try{
+                    try {
+                        processedImages = new ArrayList<Bitmap>();
                         classifier = new ImageClassifierFloatInception(mainActivity);
-                    }catch (IOException e){
-                        Log.e(TAG,"Fail to create ImageClassifier");
-                        classifier = null;
-                    }
 
-                    classifier.setNumThreads(1);
+                        classifier.setNumThreads(1);
 
-                    SpannableStringBuilder textToShow = new SpannableStringBuilder();
-                    //Bitmap bitmap = textureView.getBitmap(classifier.getImageSizeX(), classifier.getImageSizeY())
-                    //여기서 카메라 비트맵이미지를 담아서 생성되었던 classifier(dengception)객체에게 다시 classifyFrame() 호출시킴
+                        SpannableStringBuilder textToShow = new SpannableStringBuilder();
+                        //Bitmap bitmap = textureView.getBitmap(classifier.getImageSizeX(), classifier.getImageSizeY())
+                        //여기서 카메라 비트맵이미지를 담아서 생성되었던 classifier(dengception)객체에게 다시 classifyFrame() 호출시킴
 
+                        float height = sdkManager.getAircraftHeight(); // 높이 가져오기
 
-                    testData = Bitmap.createScaledBitmap(bitmap1,classifier.getImageSizeX(),classifier.getImageSizeY(),true); // 모델에 넣기 위한 이미지 리사이즈
-                    classifier.classifyFrame(testData, textToShow);
+                        // 높이 맞추기
+                        while (true) {
+                            if (height < 5) break;
+                            sleep(3000);
+                            sdkManager.down();
+                        }
+                        Log.d(TAG,"높이 맞추기 성공! 높이 : " + height);
+                        height=5;
 
-                    float height = sdkManager.getAircraftHeight(); // 높이 가져오기
+                        // 카메라 짐볼 내리기
+                        ((CustomDroneSDKManager) sdkManager).moveGimbalDownAll();
+                        sleep(5000);
+                        Log.d(TAG,"짐볼 내리기 성공! ");
 
-                    //TODO
-                    ImageDivide divide = new ImageDivide(testData,(int)height); // 이미지 divide 높이 만큼 divide
-                    divide.cropImage(); // divide 수행
-                    List<Bitmap> imagaes =divide.getCroppedImages(); // divide 결과 리스트 가져오기
+                        //캡처
+                        sdkManager.getCapture(mainActivity.getmVideoSurface());
+                        testData = ((CustomDroneSDKManager) sdkManager).getCaptureView();
+                        Log.d(TAG,"캡처 성공");
 
+                        ImageDivide divide = new ImageDivide(testData, (int) height); // 이미지 divide 높이 만큼 divide
+                        divide.cropImage(); // divide 수행
+                        Log.d(TAG,"이미지 분할 성공");
+                        divededImages = divide.getCroppedImages(); // divide 결과 리스트 가져오기
+                        Log.d(TAG,"이미지 분할 결과 가져오기 성공");
 
-                    // test
-                    Bitmap map = imagaes.get(12);
+                        for (Bitmap image : divededImages) {
+                            processedImages.add(Bitmap.createScaledBitmap(image, classifier.getImageSizeX(), classifier.getImageSizeY(), true)); // 리사이즈 해서 벡터에 저장
 
-                    FileOutputStream fos;
+                        }
+                        Log.d(TAG,"이미지 리사이즈 성공");
 
-                    String strFolderPath = Environment.getExternalStorageDirectory() + "/Pictures/SDC";
+                        // 모델 동작
+                        int count=0, row=0, col=0;
+                        for(Bitmap image: processedImages){
+                            classifier.classifyFrame(image, textToShow);
+                            col = (int) (count % height);
+                            row = (int) (count / height);
+                            Log.d(TAG,"row , col = " + row + ", " + col + "count = " + count);
+                            labelInfoList.add(new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),row,col));
+                            count++;
+                        }
+                        Log.d(TAG,"리사이즈된 이미지 라벨 분류 성공");
+                        List<Map.Entry<String,Float>> labelList = classifier.getLabelProcess().getLabelList();
+                        Log.d(TAG,"라벨 리스트 가져오기 성공");
 
-                    File myFile = new File(strFolderPath);
+                        //가장 가까운 safe zone 인덱스 찾아서 가져오기
 
-                    if(!myFile.exists()) {
-                        myFile.mkdirs();
-                    }
+                        //TODO  CustomObject shortestPathDetection(labelList);
+                        ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
+                        Log.d(TAG,"최단 경로 계산 성공");
+                        // Landing
+                        //TODO 거리계산( 실제 제어 횟수 계산 ) 후 이동 후 착륙 smartLanding(CustomObject);
+                        smartLanding(labelInfo,labelInfoList);
+                        Log.d(TAG,"경로 이동, 착지 성공");
 
-                    String strFilePath = strFolderPath + "/" + "testData" + ".png";
-                    File fileCacheItem = new File(strFilePath);
-
-                    try {
-                        fos = new FileOutputStream(fileCacheItem);
-                        map.compress(Bitmap.CompressFormat.PNG, 100, fos);
-
-                        mainActivity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-                                Uri.parse("file://"+ strFilePath)));
-                        Log.d(TAG,"capture success");
-                        Log.d(TAG, strFilePath);
-
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-
-                    testData.recycle();
-                    bitmap1.recycle();
-
-                    try {
-                        sleep(3000);
-                        sdkManager.landing();
+                        // 자원 해제
+                        testData.recycle();
+                        for (Bitmap image : divededImages) {
+                            image.recycle();
+                        }
+                        for(Bitmap image: processedImages){
+                           image.recycle();
+                        }
+                        Log.d(TAG,"자원 해제 성공");
                     }catch (Exception e){
-
+                        e.printStackTrace();
+                        Log.e(TAG,e.getMessage());
                     }
-//                        try {
-//                            ((CustomDroneSDKManager)sdkManager).moveGimbalDownAll();
-//                            sleep(3000);
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                            Log.d("Emergency Service", "error is : "+e.getMessage());
-//                        }
                 }
             };
-
-
-
             mThread.start();
         }
         return START_STICKY;
@@ -141,6 +164,82 @@ public class EmergencyService extends Service {
         if(mThread != null)
             mThread = null;
     }
+    public ImageLabelInfo shortestPathDetection(List<ImageLabelInfo> imageLabelInfo){
+        int center = imageLabelInfo.size() / 2 ;
+        int centerRow = imageLabelInfo.get(center).getRow();
+        int centerCol = imageLabelInfo.get(center).getCols();
+
+        ImageLabelInfo min = null;//TODO 모두가 unsafe 일 경우 예외처리를 해야함
+        double shortestPath = 1000;
+
+        // 최단 경로 계산
+        for(ImageLabelInfo labelInfo : imageLabelInfo){
+            if(labelInfo.getKey().equals("safe")){
+               if(shortestPath > (Math.abs(labelInfo.getRow() - centerRow) + Math.abs(labelInfo.getCols() - centerCol))){
+
+                   shortestPath = (Math.abs(labelInfo.getRow() - centerRow) + Math.abs(labelInfo.getCols() - centerCol));
+                   Log.d(TAG,"Shortest Path : " + shortestPath);
+                   min = labelInfo;
+                }
+            }
+        }
+        return min;
+    }
+
+    public void smartLanding(ImageLabelInfo labelInfo, List<ImageLabelInfo> imageLabelInfo){
+        int center = imageLabelInfo.size() / 2 ;
+        int centerRow = imageLabelInfo.get(center).getRow();
+        int centerCol = imageLabelInfo.get(center).getCols();
+
+        if(labelInfo != null){
+            if(centerRow > labelInfo.getRow()){
+                for(int i=0; i<Math.abs(centerRow - labelInfo.getRow()); i++) {
+                    try {
+                        Thread.sleep(3000);
+                        sdkManager.left();
+                    }catch (Exception e){
+
+                    }
+                }
+            }else if (centerRow < labelInfo.getRow()){
+                for(int i=0; i< Math.abs(centerRow - labelInfo.getRow()); i++) {
+                    try {
+                        Thread.sleep(3000);
+                        sdkManager.right();
+                    }catch (Exception e){
+
+                    }
+                }
+            }
+
+            if(centerCol > labelInfo.getCols()){
+                for(int i=0; i<Math.abs(centerCol - labelInfo.getCols()); i++) {
+                    try {
+                        Thread.sleep(3000);
+                        sdkManager.forward();
+                    }catch (Exception e){
+
+                    }
+                }
+            } else if (centerCol < labelInfo.getCols()) {
+                for(int i=0; i<Math.abs(centerCol - labelInfo.getCols()); i++) {
+                    try {
+                        Thread.sleep(3000);
+                        sdkManager.back();
+                    }catch (Exception e){
+                    }
+                }
+            }
+            try {
+                sleep(3000);
+                sdkManager.landing();
+
+            }catch (Exception e){
+
+            }
+        }
+    }
+
 
     public class MyBinder extends Binder {
         public EmergencyService getService(){
@@ -175,11 +274,4 @@ public class EmergencyService extends Service {
         this.classifier = classifier;
     }
 
-    public Bitmap getBitmap1() {
-        return bitmap1;
-    }
-
-    public void setBitmap1(Bitmap bitmap1) {
-        this.bitmap1 = bitmap1;
-    }
 }

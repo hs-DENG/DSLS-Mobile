@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
         Log.d(TAG, "mVideoSurface : " + mVideoSurface);
-        if(sdkManager != null){
+        if (sdkManager != null) {
             // Main Activity œìž‘
             droneInfoManager = DroneInfoManager.getInstance();
             droneInfoManager.init(sdkManager);
@@ -69,15 +69,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             emergencyLandingManager = EmergencyLandingManager.getInstance();
             emergencyLandingManager.init(sdkManager);
             emergencyLandingManager.setActivity(this);
-        }
-        else{
+        } else {
             Toast.makeText(this, "from" + TAG + " error : SDK is Null", Toast.LENGTH_SHORT);
             finish();
         }
 
         sdkManager.getVideo(mVideoSurface);
-    }
+        Thread th = new Thread(){
+            @Override
+            public void run() {
+                while(true){
+                    try{
+                        sleep(1000);
+                        heightText.setText(Float.toString(sdkManager.getAircraftHeight()));
+                    }catch (Exception e){
+                        Log.d(TAG,e.getMessage());
+                    }
+                }
+            }
+        };
 
+        th.start();
+
+    }
     public void initUI(){
         up = (Button)findViewById(R.id.btn_up);
         up.setOnClickListener(this);
@@ -93,11 +107,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         back.setOnClickListener(this);
         heightText = (TextView)findViewById(R.id.height);
     }
+
     @Override
     public void onClick(View v) {
         //super.onWindowFocusChanged(hasFocus);
 
-        if(sdkManager != null) {
+        if (sdkManager != null) {
             switch (v.getId()) {
 
                 case R.id.btn_up: {
@@ -203,5 +218,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public TextView getHeightText() {
         return heightText;
+    }
+
+    public TextureView getmVideoSurface() {
+        return mVideoSurface;
     }
 }
