@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="kr.ac.hansung.deng.smartdronecontroller">
-
     <!-- Permissions and features -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -18,7 +17,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -28,9 +27,6 @@
     <uses-feature
         android:name="android.hardware.usb.accessory"
         android:required="true" />
-    <!-- Permissions and features -->
-
-
 
     <application
         android:name="kr.ac.hansung.deng.app.SDCApplication"
@@ -41,6 +37,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <activity android:name="kr.ac.hansung.deng.activity.SplashActivity"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <!-- DJI SDK -->
         <uses-library android:name="com.android.future.usb.accessory" />
 
@@ -60,17 +64,11 @@
                 android:resource="@xml/accessory_filter" />
         </activity>
 
-        <service android:name="dji.sdk.sdkmanager.DJIGlobalService" />
-        <!-- DJI SDK -->
+        <service android:name="dji.sdk.sdkmanager.DJIGlobalService" /> <!-- DJI SDK -->
+        <activity android:name="kr.ac.hansung.deng.activity.ConnectActivity"/>
 
-        <activity android:name="kr.ac.hansung.deng.activity.ConnectActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name="kr.ac.hansung.deng.app.MainActivity"
+        <activity
+            android:name="kr.ac.hansung.deng.app.MainActivity"
             android:screenOrientation="landscape"/>
 
         <service

@@ -27,6 +27,9 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:onClick="onClickEmergency"
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:text="비상 착륙" />
 
         <Button
@@ -36,6 +39,9 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:onClick="onClickTakeoff"
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:text="이륙" />
 
         <Button
@@ -45,6 +51,9 @@
             android:layout_below="@+id/btn_takeoff"
             android:layout_alignParentStart="true"
             android:onClick="onClickLand"
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:text="착륙" />
 
         <Button
@@ -55,6 +64,9 @@
             android:layout_alignBottom="@+id/btn_land"
             android:layout_marginStart="-480dp"
             android:layout_marginBottom="-100dp"
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:text="위" />
 
         <Button
@@ -65,6 +77,9 @@
             android:layout_alignBottom="@+id/btn_land"
             android:layout_marginStart="-480dp"
             android:layout_marginBottom="-200dp"
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:text="아래" />
 
         <Button
@@ -75,6 +90,9 @@
             android:layout_alignBottom="@+id/btn_land"
             android:layout_marginStart="-180dp"
             android:layout_marginBottom="-150dp"
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:text="왼쪽" />
 
         <Button
@@ -85,6 +103,9 @@
             android:layout_alignBottom="@+id/btn_land"
             android:layout_marginStart="-40dp"
             android:layout_marginBottom="-150dp"
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:text="오른" />
 
         <Button
@@ -95,6 +116,9 @@
             android:layout_alignBottom="@+id/btn_land"
             android:layout_marginStart="-110dp"
             android:layout_marginBottom="-100dp"
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:text="앞" />
 
         <Button
@@ -105,29 +129,32 @@
             android:layout_alignBottom="@+id/btn_land"
             android:layout_marginStart="-110dp"
             android:layout_marginBottom="-200dp"
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:text="뒤" />
 
 
         <!--<view-->
-            <!--android:id="@+id/right_joystick"-->
-            <!--class="kr.ac.hansung.deng.view.RightJoystickView"-->
-            <!--id="@+id/view_right"-->
-            <!--layout_width="match_parent"-->
-            <!--android:layout_width="175dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentBottom="true"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--android:layout_weight="1"/>-->
+        <!--android:id="@+id/right_joystick"-->
+        <!--class="kr.ac.hansung.deng.view.RightJoystickView"-->
+        <!--id="@+id/view_right"-->
+        <!--layout_width="match_parent"-->
+        <!--android:layout_width="175dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_weight="1"/>-->
 
         <!--<view-->
-            <!--android:id="@+id/left_joystick"-->
-            <!--class="kr.ac.hansung.deng.view.LeftJoystickView"-->
-            <!--id="@+id/view_left"-->
-            <!--layout_width="match_parent"-->
-            <!--android:layout_width="175dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentBottom="true"-->
-            <!--android:layout_weight="1"/>-->
+        <!--android:id="@+id/left_joystick"-->
+        <!--class="kr.ac.hansung.deng.view.LeftJoystickView"-->
+        <!--id="@+id/view_left"-->
+        <!--layout_width="match_parent"-->
+        <!--android:layout_width="175dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_weight="1"/>-->
 
         <Button
             android:id="@+id/btn_capture"
@@ -136,6 +163,9 @@
             android:layout_alignStart="@+id/btn_emergency"
             android:layout_alignBottom="@+id/btn_land"
             android:onClick="onClickCapture"
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:text="캡쳐" />
 
         <Button
@@ -145,7 +175,11 @@
             android:layout_below="@+id/btn_capture"
             android:layout_alignParentEnd="true"
             android:onClick="onClickDown"
-            android:text="down" />
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
+            android:textAllCaps="false"
+            android:text="Down" />
 
         <Button
             android:id="@+id/btn_gimbal_up"
@@ -154,7 +188,11 @@
             android:layout_alignBottom="@+id/btn_gimbal_down"
             android:layout_alignParentStart="true"
             android:onClick="onClickUp"
-            android:text="up" />
+            android:background="@drawable/button"
+            android:textSize="18sp"
+            android:typeface="monospace"
+            android:textAllCaps="false"
+            android:text="Up" />
 
         <TextView
             android:id="@+id/height"
