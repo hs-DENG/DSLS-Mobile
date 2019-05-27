@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Binder;
@@ -12,6 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
+import android.view.TextureView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,6 +35,7 @@ import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.model.ImageLabelInfo;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 import kr.ac.hansung.deng.util.ImageDivide;
+import kr.ac.hansung.deng.view.EmergencyView;
 
 import static java.lang.Thread.sleep;
 
@@ -49,6 +52,9 @@ public class EmergencyService extends Service {
     private ImageClassifier classifier;
     private MainActivity mainActivity;
     private SDKManager sdkManager;
+
+    // safe/unsafe picture info
+    private EmergencyView emergencyView;
 
     // model
     private List<ImageLabelInfo> labelInfoList = new ArrayList<ImageLabelInfo>();
@@ -129,7 +135,12 @@ public class EmergencyService extends Service {
 
                         //TODO  CustomObject shortestPathDetection(labelList);
                         ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
+
                         Log.d(TAG,"최단 경로 계산 성공");
+
+                        //TODO 사진 분할 후 safe/unsafe
+                        emergencyView = new EmergencyView(mainActivity, testData, labelInfoList);
+
                         // Landing
                         //TODO 거리계산( 실제 제어 횟수 계산 ) 후 이동 후 착륙 smartLanding(CustomObject);
                         smartLanding(labelInfo,labelInfoList);
