@@ -75,21 +75,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         sdkManager.getVideo(mVideoSurface);
-        Thread th = new Thread(){
-            @Override
-            public void run() {
-                while(true){
-                    try{
-                        sleep(1000);
-                        heightText.setText(Float.toString(sdkManager.getAircraftHeight()));
-                    }catch (Exception e){
-                        Log.d(TAG,e.getMessage());
-                    }
-                }
-            }
-        };
-
-        th.start();
+//        Thread th = new Thread(){
+//            @Override
+//            public void run() {
+//                while(true){
+//                    try{
+//                        sleep(1000);
+//                        heightText.setText(Float.toString(sdkManager.getAircraftHeight()));
+//                    }catch (Exception e){
+//                        Log.d(TAG,e.getMessage());
+//                    }
+//                }
+//            }
+//        };
+//
+//        th.start();
 
     }
     public void initUI(){
@@ -205,11 +205,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onClickDown(View view){
-        sdkManager.moveGimbalDown();
+        sdkManager.moveGimbalDownAll();
     }
 
     public void onClickUp(View view){
-        sdkManager.moveGimbalUp();
+        sdkManager.moveGimbalUpAll();
     }
 
     public CustomDroneSDKManager getSdkManager() {

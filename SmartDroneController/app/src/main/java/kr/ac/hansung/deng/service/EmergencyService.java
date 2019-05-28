@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import javax.security.auth.login.LoginException;
+
 import kr.ac.hansung.deng.ML.ImageClassifier;
 import kr.ac.hansung.deng.ML.ImageClassifierFloatInception;
 import kr.ac.hansung.deng.app.MainActivity;
@@ -69,6 +71,7 @@ public class EmergencyService extends Service {
                     // 캡쳐 이미지 모델에 돌리기
 
                     try {
+
                         processedImages = new ArrayList<Bitmap>();
                         classifier = new ImageClassifierFloatInception(mainActivity);
 
@@ -78,13 +81,15 @@ public class EmergencyService extends Service {
                         //Bitmap bitmap = textureView.getBitmap(classifier.getImageSizeX(), classifier.getImageSizeY())
                         //여기서 카메라 비트맵이미지를 담아서 생성되었던 classifier(dengception)객체에게 다시 classifyFrame() 호출시킴
 
-                        float height = sdkManager.getAircraftHeight(); // 높이 가져오기
 
+                        float height=0;
                         // 높이 맞추기
                         while (true) {
                             if (height < 5) break;
-                            sleep(3000);
+                            height = sdkManager.getAircraftHeight(); // 높이 가져오기
+                            sleep(2000);
                             sdkManager.down();
+                            sleep(2000);
                         }
                         Log.d(TAG,"높이 맞추기 성공! 높이 : " + height);
                         height=5;
@@ -117,19 +122,21 @@ public class EmergencyService extends Service {
                             classifier.classifyFrame(image, textToShow);
                             col = (int) (count % height);
                             row = (int) (count / height);
-                            Log.d(TAG,"row , col = " + row + ", " + col + "count = " + count);
+                            Log.d(TAG,"row , col = [" + row + ", " + col + "] count = " + count);
                             labelInfoList.add(new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),row,col));
                             count++;
                         }
                         Log.d(TAG,"리사이즈된 이미지 라벨 분류 성공");
-                        List<Map.Entry<String,Float>> labelList = classifier.getLabelProcess().getLabelList();
-                        Log.d(TAG,"라벨 리스트 가져오기 성공");
+
+                       // List<Map.Entry<String,Float>> labelList = classifier.getLabelProcess().getLabelList();
+
+                       // Log.d(TAG,"라벨 리스트 가져오기 성공");
 
                         //가장 가까운 safe zone 인덱스 찾아서 가져오기
 
                         //TODO  CustomObject shortestPathDetection(labelList);
                         ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
-                        Log.d(TAG,"최단 경로 계산 성공");
+                        Log.d(TAG,"최단 경로 계산 성공 LabelInfo is : " + labelInfo.toString());
                         // Landing
                         //TODO 거리계산( 실제 제어 횟수 계산 ) 후 이동 후 착륙 smartLanding(CustomObject);
                         smartLanding(labelInfo,labelInfoList);
@@ -171,8 +178,13 @@ public class EmergencyService extends Service {
 
         ImageLabelInfo min = null;//TODO 모두가 unsafe 일 경우 예외처리를 해야함
         double shortestPath = 1000;
-
+        Log.d(TAG, "imageLabelInfo size : " + imageLabelInfo.size());
         // 최단 경로 계산
+        for(int i=0;i<imageLabelInfo.size();i++){
+            ImageLabelInfo labelInfo = imageLabelInfo.get(i);
+            Log.d(TAG, "image Label Info row col = [" + imageLabelInfo.get(i).getRow() + ", " + imageLabelInfo.get(i).getCols() + "]");
+            Log.d(TAG,"label : " + labelInfo.getKey());
+        }
         for(ImageLabelInfo labelInfo : imageLabelInfo){
             if(labelInfo.getKey().equals("safe")){
                if(shortestPath > (Math.abs(labelInfo.getRow() - centerRow) + Math.abs(labelInfo.getCols() - centerCol))){
@@ -195,7 +207,7 @@ public class EmergencyService extends Service {
             if(centerRow > labelInfo.getRow()){
                 for(int i=0; i<Math.abs(centerRow - labelInfo.getRow()); i++) {
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(2000);
                         sdkManager.left();
                     }catch (Exception e){
 
@@ -204,7 +216,7 @@ public class EmergencyService extends Service {
             }else if (centerRow < labelInfo.getRow()){
                 for(int i=0; i< Math.abs(centerRow - labelInfo.getRow()); i++) {
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(2000);
                         sdkManager.right();
                     }catch (Exception e){
 
@@ -215,7 +227,7 @@ public class EmergencyService extends Service {
             if(centerCol > labelInfo.getCols()){
                 for(int i=0; i<Math.abs(centerCol - labelInfo.getCols()); i++) {
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(2000);
                         sdkManager.forward();
                     }catch (Exception e){
 
@@ -224,7 +236,7 @@ public class EmergencyService extends Service {
             } else if (centerCol < labelInfo.getCols()) {
                 for(int i=0; i<Math.abs(centerCol - labelInfo.getCols()); i++) {
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(2000);
                         sdkManager.back();
                     }catch (Exception e){
                     }
