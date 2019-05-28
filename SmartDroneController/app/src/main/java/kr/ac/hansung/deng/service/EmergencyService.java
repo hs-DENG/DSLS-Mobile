@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Binder;
@@ -12,6 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
+import android.view.TextureView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,6 +37,7 @@ import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.model.ImageLabelInfo;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 import kr.ac.hansung.deng.util.ImageDivide;
+import kr.ac.hansung.deng.view.EmergencyView;
 
 import static java.lang.Thread.sleep;
 
@@ -44,13 +47,16 @@ public class EmergencyService extends Service {
     private Thread mThread = null;
     private int mCount = 0;
 
-    // 학습 필드
+    // �습 �드
     private Bitmap testData;
     private List<Bitmap> divededImages;
     private List<Bitmap> processedImages;
     private ImageClassifier classifier;
     private MainActivity mainActivity;
     private SDKManager sdkManager;
+
+    // safe/unsafe picture info
+    private EmergencyView emergencyView;
 
     // model
     private List<ImageLabelInfo> labelInfoList = new ArrayList<ImageLabelInfo>();
@@ -62,13 +68,13 @@ public class EmergencyService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand()");
 
-        // 스레드
+        // �레
         if(mThread == null){
             mThread = new Thread("My Thread"){
                 @Override
                 public void run(){
-                    // 이미지 정보 받기 ( 드론 정보 서비스로부터)
-                    // 캡쳐 이미지 모델에 돌리기
+                    // ��지 �보 받기 ( �론 �보 �비�로부
+                    // 캡쳐 ��지 모델�리�
 
                     try {
 
@@ -79,44 +85,44 @@ public class EmergencyService extends Service {
 
                         SpannableStringBuilder textToShow = new SpannableStringBuilder();
                         //Bitmap bitmap = textureView.getBitmap(classifier.getImageSizeX(), classifier.getImageSizeY())
-                        //여기서 카메라 비트맵이미지를 담아서 생성되었던 classifier(dengception)객체에게 다시 classifyFrame() 호출시킴
+                        //�기카메비트맵이미�르아�성�었classifier(dengception)객체�게 �시 classifyFrame() �출�킴
 
 
                         float height=0;
-                        // 높이 맞추기
+                        // �이 맞추�
                         while (true) {
                             if (height < 5) break;
-                            height = sdkManager.getAircraftHeight(); // 높이 가져오기
+                            height = sdkManager.getAircraftHeight(); // �이 가�오�
                             sleep(2000);
                             sdkManager.down();
                             sleep(2000);
                         }
-                        Log.d(TAG,"높이 맞추기 성공! 높이 : " + height);
+                        Log.d(TAG,"�이 맞추긱공! �이 : " + height);
                         height=5;
 
-                        // 카메라 짐볼 내리기
+                        // 카메짐볼 �리�
                         ((CustomDroneSDKManager) sdkManager).moveGimbalDownAll();
                         sleep(5000);
-                        Log.d(TAG,"짐볼 내리기 성공! ");
+                        Log.d(TAG,"짐볼 �리긱공! ");
 
                         //캡처
                         sdkManager.getCapture(mainActivity.getmVideoSurface());
                         testData = ((CustomDroneSDKManager) sdkManager).getCaptureView();
-                        Log.d(TAG,"캡처 성공");
+                        Log.d(TAG,"캡처 �공");
 
-                        ImageDivide divide = new ImageDivide(testData, (int) height); // 이미지 divide 높이 만큼 divide
-                        divide.cropImage(); // divide 수행
-                        Log.d(TAG,"이미지 분할 성공");
-                        divededImages = divide.getCroppedImages(); // divide 결과 리스트 가져오기
-                        Log.d(TAG,"이미지 분할 결과 가져오기 성공");
+                        ImageDivide divide = new ImageDivide(testData, (int) height); // ��지 divide �이 만큼 divide
+                        divide.cropImage(); // divide �행
+                        Log.d(TAG,"��지 분할 �공");
+                        divededImages = divide.getCroppedImages(); // divide 결과 리스가�오�
+                        Log.d(TAG,"��지 분할 결과 가�오긱공");
 
                         for (Bitmap image : divededImages) {
-                            processedImages.add(Bitmap.createScaledBitmap(image, classifier.getImageSizeX(), classifier.getImageSizeY(), true)); // 리사이즈 해서 벡터에 저장
+                            processedImages.add(Bitmap.createScaledBitmap(image, classifier.getImageSizeX(), classifier.getImageSizeY(), true)); // 리사�즈 �서 벡터�
 
                         }
-                        Log.d(TAG,"이미지 리사이즈 성공");
+                        Log.d(TAG,"��지 리사�즈 �공");
 
-                        // 모델 동작
+                        // 모델 �작
                         int count=0, row=0, col=0;
                         for(Bitmap image: processedImages){
                             classifier.classifyFrame(image, textToShow);
@@ -126,23 +132,27 @@ public class EmergencyService extends Service {
                             labelInfoList.add(new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),row,col));
                             count++;
                         }
-                        Log.d(TAG,"리사이즈된 이미지 라벨 분류 성공");
+                        Log.d(TAG,"리사�즈��지 �벨 분류 �공");
 
                        // List<Map.Entry<String,Float>> labelList = classifier.getLabelProcess().getLabelList();
 
-                       // Log.d(TAG,"라벨 리스트 가져오기 성공");
+                       // Log.d(TAG,"�벨 리스가�오긱공");
 
-                        //가장 가까운 safe zone 인덱스 찾아서 가져오기
+                        //가가까운 safe zone �덱찾아가�오�
 
                         //TODO  CustomObject shortestPathDetection(labelList);
                         ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
-                        Log.d(TAG,"최단 경로 계산 성공 LabelInfo is : " + labelInfo.toString());
-                        // Landing
-                        //TODO 거리계산( 실제 제어 횟수 계산 ) 후 이동 후 착륙 smartLanding(CustomObject);
-                        smartLanding(labelInfo,labelInfoList);
-                        Log.d(TAG,"경로 이동, 착지 성공");
+                        Log.d(TAG,"최단 경로 계산 �공 LabelInfo is : " + labelInfo.toString());
 
-                        // 자원 해제
+                        //TODO �진 분할 safe/unsafe
+                        emergencyView = new EmergencyView(mainActivity, testData, labelInfoList);
+
+                        // Landing
+                        //TODO 거리계산( �제 �어 �수 계산 ) �동 착륙 smartLanding(CustomObject);
+                        smartLanding(labelInfo,labelInfoList);
+                        Log.d(TAG,"경로 �동, 착� �공");
+
+                        // �원 �제
                         testData.recycle();
                         for (Bitmap image : divededImages) {
                             image.recycle();
@@ -150,7 +160,7 @@ public class EmergencyService extends Service {
                         for(Bitmap image: processedImages){
                            image.recycle();
                         }
-                        Log.d(TAG,"자원 해제 성공");
+                        Log.d(TAG,"�원 �제 �공");
                     }catch (Exception e){
                         e.printStackTrace();
                         Log.e(TAG,e.getMessage());
@@ -176,7 +186,7 @@ public class EmergencyService extends Service {
         int centerRow = imageLabelInfo.get(center).getRow();
         int centerCol = imageLabelInfo.get(center).getCols();
 
-        ImageLabelInfo min = null;//TODO 모두가 unsafe 일 경우 예외처리를 해야함
+        ImageLabelInfo min = null;//TODO 모두가 unsafe 경우 �외처리르야
         double shortestPath = 1000;
         Log.d(TAG, "imageLabelInfo size : " + imageLabelInfo.size());
         // 최단 경로 계산

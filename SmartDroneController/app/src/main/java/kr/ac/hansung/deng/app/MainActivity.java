@@ -10,7 +10,9 @@ import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,10 +42,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EmergencyLandingManager emergencyLandingManager;
     private RelativeLayout myLayout;
     private TextView heightText;
+    private ImageButton takeOffBtn, landingBtn, emergencyBtn, captureBtn;
+    private ImageButton btnUp, btnDown, btnForward, btnBack, btnLeft, btnRight;
+    private SeekBar mSeekBar;
+    private int touched = 0;
+
     // Codec for video live view
 
     // 방향
-    private Button left, right, forward, back, up, down;
+    //private Button left, right, forward, back, up, down;
 
     protected TextureView mVideoSurface = null;
 
@@ -58,6 +65,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sdkManager.initController();
 
         initUI();
+
+        takeOffBtn = (ImageButton) findViewById(R.id.btn_takeoff);
+        landingBtn = (ImageButton) findViewById(R.id.btn_landing);
+        emergencyBtn = (ImageButton) findViewById(R.id.btn_emergency);
+        captureBtn = (ImageButton) findViewById(R.id.btn_capture);
+
+        btnUp = (ImageButton) findViewById(R.id.btn_up);
+        btnDown = (ImageButton) findViewById(R.id.btn_down);
+        btnForward = (ImageButton) findViewById(R.id.btn_forward);
+        btnBack = (ImageButton) findViewById(R.id.btn_back);
+        btnLeft = (ImageButton) findViewById(R.id.btn_left);
+        btnRight = (ImageButton) findViewById(R.id.btn_right);
+
+        mSeekBar = (SeekBar) findViewById(R.id.seekBar);
 
         mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
         Log.d(TAG, "mVideoSurface : " + mVideoSurface);
@@ -91,20 +112,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //
 //        th.start();
 
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser){
+                    if(seekBar.getProgress() < 50){
+                        touched = -1;
+                    }
+                    else if(seekBar.getProgress() > 50){
+                        touched = 1;
+
+                    }
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                seekBar.setProgress(50);
+                if(touched < 0){
+                    sdkManager.moveGimbalDown();
+                    //Toast.makeText(getApplicationContext(), "Drone Gimbal moved down!", Toast.LENGTH_SHORT).show();
+                }
+                else if(touched > 0){
+                    sdkManager.moveGimbalUp();
+                    //Toast.makeText(getApplicationContext(), "Drone Gimbal moved up!", Toast.LENGTH_SHORT).show();
+                }
+                touched = 0;
+            }
+        });
     }
     public void initUI(){
-        up = (Button)findViewById(R.id.btn_up);
-        up.setOnClickListener(this);
-        down = (Button)findViewById(R.id.btn_down);
-        down.setOnClickListener(this);
-        left = (Button)findViewById(R.id.btn_left);
-        left.setOnClickListener(this);
-        right = (Button)findViewById(R.id.btn_right);
-        right.setOnClickListener(this);
-        forward = (Button)findViewById(R.id.btn_forward);
-        forward.setOnClickListener(this);
-        back = (Button)findViewById(R.id.btn_back);
-        back.setOnClickListener(this);
+        btnUp = (ImageButton)findViewById(R.id.btn_up);
+        btnUp.setOnClickListener(this);
+        btnDown = (ImageButton)findViewById(R.id.btn_down);
+        btnDown.setOnClickListener(this);
+        btnLeft = (ImageButton)findViewById(R.id.btn_left);
+        btnLeft.setOnClickListener(this);
+        btnRight = (ImageButton)findViewById(R.id.btn_right);
+        btnRight.setOnClickListener(this);
+        btnForward = (ImageButton)findViewById(R.id.btn_forward);
+        btnForward.setOnClickListener(this);
+        btnBack = (ImageButton)findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(this);
         heightText = (TextView)findViewById(R.id.height);
     }
 
@@ -186,6 +240,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //emergency button
     public void onClickEmergency(View view){
+        takeOffBtn.setVisibility(View.INVISIBLE);
+        landingBtn.setVisibility(View.INVISIBLE);
+        emergencyBtn.setVisibility(View.INVISIBLE);
+        captureBtn.setVisibility(View.INVISIBLE);
+
+        btnUp.setVisibility(View.INVISIBLE);
+        btnDown.setVisibility(View.INVISIBLE);
+        btnForward.setVisibility(View.INVISIBLE);
+        btnBack.setVisibility(View.INVISIBLE);
+        btnLeft.setVisibility(View.INVISIBLE);
+        btnRight.setVisibility(View.INVISIBLE);
+
         //TODO Do Smart Landing
         emergencyLandingManager.runService();
     }
@@ -204,13 +270,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sdkManager.getCapture(mVideoSurface);
     }
 
-    public void onClickDown(View view){
+    /*public void onClickDown(View view){
         sdkManager.moveGimbalDownAll();
     }
 
     public void onClickUp(View view){
         sdkManager.moveGimbalUpAll();
-    }
+    }*/
 
     public CustomDroneSDKManager getSdkManager() {
         return sdkManager;
