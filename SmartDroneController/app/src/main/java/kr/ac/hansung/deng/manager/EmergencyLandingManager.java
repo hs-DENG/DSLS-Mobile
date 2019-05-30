@@ -27,8 +27,7 @@ public class EmergencyLandingManager{
     public void runService(){
         emergencyService = new EmergencyService();
         emergencyService.setActivity(mainActivity);
-        // 인자값 내맘대로 넣었음 의미없는 매개변수임... 태성
-        emergencyService.setBitmap1(sdkManager.getCaptureView());
+        //emergencyService.setBitmap1(sdkManager.getCaptureView());
         emergencyService.onStartCommand(new Intent() ,0 , 0);
     }
 

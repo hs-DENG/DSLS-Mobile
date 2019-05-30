@@ -670,4 +670,5 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
         };
         thread.start();
     }
+
 }

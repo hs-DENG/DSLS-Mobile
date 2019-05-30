@@ -20,191 +20,136 @@
             android:layout_height="match_parent"
             android:layout_gravity="center" />
 
-        <Button
-            android:id="@+id/btn_emergency"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:onClick="onClickEmergency"
-            android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:text="비상 착륙" />
-
-        <Button
+        <ImageButton
             android:id="@+id/btn_takeoff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:background="@drawable/button"
+            android:onClick="onClickTakeoff"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:onClick="onClickTakeoff"
-            android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:text="이륙" />
+            app:srcCompat="@drawable/take_off2" />
 
-        <Button
-            android:id="@+id/btn_land"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:id="@+id/btn_landing"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_below="@+id/btn_takeoff"
             android:layout_alignParentStart="true"
             android:onClick="onClickLand"
             android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:text="착륙" />
+            app:srcCompat="@drawable/land_ing2" />
 
-        <Button
-            android:id="@+id/btn_up"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/btn_emergency"
-            android:layout_alignBottom="@+id/btn_land"
-            android:layout_marginStart="-480dp"
-            android:layout_marginBottom="-100dp"
-            android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:text="위" />
-
-        <Button
-            android:id="@+id/btn_down"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/btn_emergency"
-            android:layout_alignBottom="@+id/btn_land"
-            android:layout_marginStart="-480dp"
-            android:layout_marginBottom="-200dp"
-            android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:text="아래" />
-
-        <Button
-            android:id="@+id/btn_left"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/btn_emergency"
-            android:layout_alignBottom="@+id/btn_land"
-            android:layout_marginStart="-180dp"
-            android:layout_marginBottom="-150dp"
-            android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:text="왼쪽" />
-
-        <Button
-            android:id="@+id/btn_right"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/btn_emergency"
-            android:layout_alignBottom="@+id/btn_land"
-            android:layout_marginStart="-40dp"
-            android:layout_marginBottom="-150dp"
-            android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:text="오른" />
-
-        <Button
-            android:id="@+id/btn_forward"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/btn_emergency"
-            android:layout_alignBottom="@+id/btn_land"
-            android:layout_marginStart="-110dp"
-            android:layout_marginBottom="-100dp"
-            android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:text="앞" />
-
-        <Button
-            android:id="@+id/btn_back"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/btn_emergency"
-            android:layout_alignBottom="@+id/btn_land"
-            android:layout_marginStart="-110dp"
-            android:layout_marginBottom="-200dp"
-            android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:text="뒤" />
-
-
-        <!--<view-->
-        <!--android:id="@+id/right_joystick"-->
-        <!--class="kr.ac.hansung.deng.view.RightJoystickView"-->
-        <!--id="@+id/view_right"-->
-        <!--layout_width="match_parent"-->
-        <!--android:layout_width="175dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:layout_weight="1"/>-->
-
-        <!--<view-->
-        <!--android:id="@+id/left_joystick"-->
-        <!--class="kr.ac.hansung.deng.view.LeftJoystickView"-->
-        <!--id="@+id/view_left"-->
-        <!--layout_width="match_parent"-->
-        <!--android:layout_width="175dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_weight="1"/>-->
-
-        <Button
+        <ImageButton
             android:id="@+id/btn_capture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/btn_emergency"
-            android:layout_alignBottom="@+id/btn_land"
-            android:onClick="onClickCapture"
-            android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:text="캡쳐" />
-
-        <Button
-            android:id="@+id/btn_gimbal_down"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_capture"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:onClick="onClickDown"
             android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:textAllCaps="false"
-            android:text="Down" />
+            android:onClick="onClickCapture"
+            app:srcCompat="@drawable/camera" />
 
-        <Button
-            android:id="@+id/btn_gimbal_up"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/btn_gimbal_down"
-            android:layout_alignParentStart="true"
-            android:onClick="onClickUp"
+        <ImageButton
+            android:id="@+id/btn_emergency"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignStart="@+id/btn_capture"
+            android:layout_alignBottom="@+id/btn_landing"
             android:background="@drawable/button"
-            android:textSize="18sp"
-            android:typeface="monospace"
-            android:textAllCaps="false"
-            android:text="Up" />
+            android:onClick="onClickEmergency"
+            app:srcCompat="@drawable/emergency" />
 
         <TextView
             android:id="@+id/height"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/left_joystick"
             android:layout_centerHorizontal="true"
             android:layout_alignTop="@id/btn_takeoff"
             android:text="0.0M"
+            android:textSize="18sp"
+            android:typeface="monospace"
             android:textStyle="bold"
-            android:textColor="#FF0000"
-            />
+            android:textColor="#FF0000" />
+
+        <ImageButton
+            android:id="@+id/btn_forward"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignStart="@+id/btn_capture"
+            android:layout_alignBottom="@+id/btn_landing"
+            android:layout_marginStart="-110dp"
+            android:layout_marginBottom="-100dp"
+            android:background="@drawable/button"
+            app:srcCompat="@drawable/button_up" />
+
+        <ImageButton
+            android:id="@+id/btn_right"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignStart="@+id/btn_capture"
+            android:layout_alignBottom="@+id/btn_landing"
+            android:layout_marginStart="-40dp"
+            android:layout_marginBottom="-150dp"
+            android:background="@drawable/button"
+            app:srcCompat="@drawable/button_right" />
+
+        <ImageButton
+            android:id="@+id/btn_left"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignStart="@+id/btn_capture"
+            android:layout_alignBottom="@+id/btn_landing"
+            android:layout_marginStart="-180dp"
+            android:layout_marginBottom="-150dp"
+            android:background="@drawable/button"
+            app:srcCompat="@drawable/button_left" />
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignStart="@+id/btn_capture"
+            android:layout_alignBottom="@+id/btn_landing"
+            android:layout_marginStart="-110dp"
+            android:layout_marginBottom="-200dp"
+            android:background="@drawable/button"
+            app:srcCompat="@drawable/button_down" />
+
+        <ImageButton
+            android:id="@+id/btn_up"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignStart="@+id/btn_capture"
+            android:layout_alignBottom="@+id/btn_landing"
+            android:layout_marginStart="-480dp"
+            android:layout_marginBottom="-100dp"
+            android:background="@drawable/button"
+            app:srcCompat="@drawable/button_up" />
+
+        <ImageButton
+            android:id="@+id/btn_down"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignStart="@+id/btn_capture"
+            android:layout_alignBottom="@+id/btn_landing"
+            android:layout_marginStart="-480dp"
+            android:layout_marginBottom="-200dp"
+            android:background="@drawable/button"
+            app:srcCompat="@drawable/button_down" />
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignBottom="@id/height"
+            android:layout_marginBottom="-25dp"
+            android:scaleX="2"
+            android:scaleY="2"
+            android:max="100"
+            android:progress="50"/>
+
 
     </RelativeLayout>
 

@@ -71,6 +71,7 @@ public abstract class ImageClassifier {
 
     private Map.Entry<String, Float> label;
     private Boolean endFlag = false;
+    private LabelProcess labelProcess;
 
     private PriorityQueue<Map.Entry<String, Float>> sortedLabels =
             new PriorityQueue<>(
@@ -248,14 +249,9 @@ public abstract class ImageClassifier {
         }
 
         final int size = sortedLabels.size();
-        //TODO LabelProcess 사용해서 이용
-        //LabelProcess lp = new LabelProcess(this);
-        for (int i = 0; i < size; i++) {
-            label = sortedLabels.poll();
-            Log.d("ImageClassifier",String.format("%s: %4.2f\n", label.getKey(), label.getValue())); //정확도 찍어주는 시점
+        labelProcess = new LabelProcess(this);
+        labelProcess.setLabelList(sortedLabels);
 
-
-        }
     }
 
     /**
@@ -349,5 +345,8 @@ public abstract class ImageClassifier {
         return this.label;
     }
 
+    public LabelProcess getLabelProcess() {
+        return labelProcess;
+    }
 
 }
