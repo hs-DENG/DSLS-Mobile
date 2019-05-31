@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Codec for video live view
 
-    // 방향
+    // 諛⑺뼢
     //private Button left, right, forward, back, up, down;
 
     protected TextureView mVideoSurface = null;
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
         Log.d(TAG, "mVideoSurface : " + mVideoSurface);
         if (sdkManager != null) {
-            // Main Activity �작
+            // Main Activity 쒖옉
             droneInfoManager = DroneInfoManager.getInstance();
             droneInfoManager.init(sdkManager);
 
@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //emergency button
     public void onClickEmergency(View view){
-        takeOffBtn.setVisibility(View.INVISIBLE);
+       /* takeOffBtn.setVisibility(View.INVISIBLE);
         landingBtn.setVisibility(View.INVISIBLE);
         emergencyBtn.setVisibility(View.INVISIBLE);
         captureBtn.setVisibility(View.INVISIBLE);
@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnForward.setVisibility(View.INVISIBLE);
         btnBack.setVisibility(View.INVISIBLE);
         btnLeft.setVisibility(View.INVISIBLE);
-        btnRight.setVisibility(View.INVISIBLE);
+        btnRight.setVisibility(View.INVISIBLE);*/
 
         //TODO Do Smart Landing
         emergencyLandingManager.runService();

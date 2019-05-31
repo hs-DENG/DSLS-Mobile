@@ -47,7 +47,7 @@ public class EmergencyService extends Service {
     private Thread mThread = null;
     private int mCount = 0;
 
-    // �습 �드
+    // ?습 ?드
     private Bitmap testData;
     private List<Bitmap> divededImages;
     private List<Bitmap> processedImages;
@@ -68,13 +68,13 @@ public class EmergencyService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand()");
 
-        // �레
+        // ?레
         if(mThread == null){
             mThread = new Thread("My Thread"){
                 @Override
                 public void run(){
-                    // ��지 �보 받기 ( �론 �보 �비�로부
-                    // 캡쳐 ��지 모델�리�
+                    // ??지 ?보 받기 ( ?론 ?보 ?비?로부
+                    // 캡쳐 ??지 모델?리?
 
                     try {
 
@@ -85,44 +85,44 @@ public class EmergencyService extends Service {
 
                         SpannableStringBuilder textToShow = new SpannableStringBuilder();
                         //Bitmap bitmap = textureView.getBitmap(classifier.getImageSizeX(), classifier.getImageSizeY())
-                        //�기카메비트맵이미�르아�성�었classifier(dengception)객체�게 �시 classifyFrame() �출�킴
+                        //?기카메비트맵이미?르아?성?었classifier(dengception)객체?게 ?시 classifyFrame() ?출?킴
 
 
                         float height=0;
-                        // �이 맞추�
+                        // ?이 맞추?
                         while (true) {
                             if (height < 5) break;
-                            height = sdkManager.getAircraftHeight(); // �이 가�오�
+                            height = sdkManager.getAircraftHeight(); // ?이 가?오?
                             sleep(2000);
                             sdkManager.down();
                             sleep(2000);
                         }
-                        Log.d(TAG,"�이 맞추긱공! �이 : " + height);
+                        Log.d(TAG,"?이 맞추긱공! ?이 : " + height);
                         height=5;
 
-                        // 카메짐볼 �리�
+                        // 카메짐볼 ?리?
                         ((CustomDroneSDKManager) sdkManager).moveGimbalDownAll();
                         sleep(5000);
-                        Log.d(TAG,"짐볼 �리긱공! ");
+                        Log.d(TAG,"짐볼 ?리긱공! ");
 
                         //캡처
                         sdkManager.getCapture(mainActivity.getmVideoSurface());
                         testData = ((CustomDroneSDKManager) sdkManager).getCaptureView();
-                        Log.d(TAG,"캡처 �공");
+                        Log.d(TAG,"캡처 ?공");
 
-                        ImageDivide divide = new ImageDivide(testData, (int) height); // ��지 divide �이 만큼 divide
-                        divide.cropImage(); // divide �행
-                        Log.d(TAG,"��지 분할 �공");
-                        divededImages = divide.getCroppedImages(); // divide 결과 리스가�오�
-                        Log.d(TAG,"��지 분할 결과 가�오긱공");
+                        ImageDivide divide = new ImageDivide(testData, (int) height); // ??지 divide ?이 만큼 divide
+                        divide.cropImage(); // divide ?행
+                        Log.d(TAG,"??지 분할 ?공");
+                        divededImages = divide.getCroppedImages(); // divide 결과 리스가?오?
+                        Log.d(TAG,"??지 분할 결과 가?오긱공");
 
                         for (Bitmap image : divededImages) {
-                            processedImages.add(Bitmap.createScaledBitmap(image, classifier.getImageSizeX(), classifier.getImageSizeY(), true)); // 리사�즈 �서 벡터�
+                            processedImages.add(Bitmap.createScaledBitmap(image, classifier.getImageSizeX(), classifier.getImageSizeY(), true)); // 리사?즈 ?서 벡터?
 
                         }
-                        Log.d(TAG,"��지 리사�즈 �공");
+                        Log.d(TAG,"??지 리사?즈 ?공");
 
-                        // 모델 �작
+                        // 모델 ?작
                         int count=0, row=0, col=0;
                         for(Bitmap image: processedImages){
                             classifier.classifyFrame(image, textToShow);
@@ -132,27 +132,27 @@ public class EmergencyService extends Service {
                             labelInfoList.add(new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),row,col));
                             count++;
                         }
-                        Log.d(TAG,"리사�즈��지 �벨 분류 �공");
+                        Log.d(TAG,"리사?즈??지 ?벨 분류 ?공");
 
                        // List<Map.Entry<String,Float>> labelList = classifier.getLabelProcess().getLabelList();
 
-                       // Log.d(TAG,"�벨 리스가�오긱공");
+                       // Log.d(TAG,"?벨 리스가?오긱공");
 
-                        //가가까운 safe zone �덱찾아가�오�
+                        //가가까운 safe zone ?덱찾아가?오?
 
                         //TODO  CustomObject shortestPathDetection(labelList);
                         ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
-                        Log.d(TAG,"최단 경로 계산 �공 LabelInfo is : " + labelInfo.toString());
+                        Log.d(TAG,"최단 경로 계산 ?공 LabelInfo is : " + labelInfo.toString());
 
-                        //TODO �진 분할 safe/unsafe
+                        //TODO ?진 분할 safe/unsafe
                         emergencyView = new EmergencyView(mainActivity, testData, labelInfoList);
 
                         // Landing
-                        //TODO 거리계산( �제 �어 �수 계산 ) �동 착륙 smartLanding(CustomObject);
+                        //TODO 거리계산( ?제 ?어 ?수 계산 ) ?동 착륙 smartLanding(CustomObject);
                         smartLanding(labelInfo,labelInfoList);
-                        Log.d(TAG,"경로 �동, 착� �공");
+                        Log.d(TAG,"경로 ?동, 착? ?공");
 
-                        // �원 �제
+                        // ?원 ?제
                         testData.recycle();
                         for (Bitmap image : divededImages) {
                             image.recycle();
@@ -160,7 +160,7 @@ public class EmergencyService extends Service {
                         for(Bitmap image: processedImages){
                            image.recycle();
                         }
-                        Log.d(TAG,"�원 �제 �공");
+                        Log.d(TAG,"?원 ?제 ?공");
                     }catch (Exception e){
                         e.printStackTrace();
                         Log.e(TAG,e.getMessage());
@@ -186,7 +186,7 @@ public class EmergencyService extends Service {
         int centerRow = imageLabelInfo.get(center).getRow();
         int centerCol = imageLabelInfo.get(center).getCols();
 
-        ImageLabelInfo min = null;//TODO 모두가 unsafe 경우 �외처리르야
+        ImageLabelInfo min = null;//TODO 모두가 unsafe 경우 ?외처리르야
         double shortestPath = 1000;
         Log.d(TAG, "imageLabelInfo size : " + imageLabelInfo.size());
         // 최단 경로 계산
@@ -204,6 +204,10 @@ public class EmergencyService extends Service {
                    min = labelInfo;
                 }
             }
+        }
+        if(min ==null ) {
+            min = new ImageLabelInfo("safe",2,2);
+            Log.d(TAG,"There are no safeArea ... just landing");
         }
         return min;
     }
