@@ -66,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         initUI();
 
+        this.getSupportActionBar().hide();
+
         takeOffBtn = (ImageButton) findViewById(R.id.btn_takeoff);
         landingBtn = (ImageButton) findViewById(R.id.btn_landing);
         emergencyBtn = (ImageButton) findViewById(R.id.btn_emergency);
@@ -240,17 +242,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //emergency button
     public void onClickEmergency(View view){
-        takeOffBtn.setVisibility(View.INVISIBLE);
-        landingBtn.setVisibility(View.INVISIBLE);
-        emergencyBtn.setVisibility(View.INVISIBLE);
-        captureBtn.setVisibility(View.INVISIBLE);
-
-        btnUp.setVisibility(View.INVISIBLE);
-        btnDown.setVisibility(View.INVISIBLE);
-        btnForward.setVisibility(View.INVISIBLE);
-        btnBack.setVisibility(View.INVISIBLE);
-        btnLeft.setVisibility(View.INVISIBLE);
-        btnRight.setVisibility(View.INVISIBLE);
+//        takeOffBtn.setVisibility(View.INVISIBLE);
+//        landingBtn.setVisibility(View.INVISIBLE);
+//        emergencyBtn.setVisibility(View.INVISIBLE);
+//        captureBtn.setVisibility(View.INVISIBLE);
+//
+//        btnUp.setVisibility(View.INVISIBLE);
+//        btnDown.setVisibility(View.INVISIBLE);
+//        btnForward.setVisibility(View.INVISIBLE);
+//        btnBack.setVisibility(View.INVISIBLE);
+//        btnLeft.setVisibility(View.INVISIBLE);
+//        btnRight.setVisibility(View.INVISIBLE);
 
         //TODO Do Smart Landing
         emergencyLandingManager.runService();

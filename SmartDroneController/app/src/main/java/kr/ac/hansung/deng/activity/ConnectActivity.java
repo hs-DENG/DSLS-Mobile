@@ -67,8 +67,6 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
         IntentFilter filter = new IntentFilter();
         filter.addAction(FPVApplication.FLAG_CONNECTION_CHANGE);
         registerReceiver(mReceiver, filter);
-
-
     }
 
     /**
@@ -220,5 +218,4 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
             }
         });
     }
-
 }

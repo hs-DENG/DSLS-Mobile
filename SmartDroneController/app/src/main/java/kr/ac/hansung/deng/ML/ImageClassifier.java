@@ -231,9 +231,7 @@ public abstract class ImageClassifier {
                 final int val = intValues[pixel++];
                 addPixelValue(val);
             }
-
         }
-
         long endTime = SystemClock.uptimeMillis();
         Log.d(TAG, "Timecost to put values into ByteBuffer: " + Long.toString(endTime - startTime));
     }

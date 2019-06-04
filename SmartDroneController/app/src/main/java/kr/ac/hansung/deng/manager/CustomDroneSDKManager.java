@@ -82,7 +82,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     // joystick reference
     private Timer sendVirtualStickDataTimer;
     private SendVirtualStickDataTask sendVirtualStickDataTask;
-    float mPitch=0; // ë’¤ ´ë™ê±°ë¦¬ ¤ì°¨ë²”ìœ„ 65~75cm
+    float mPitch=0; // ë’¤ ´ë™ê±°ë¦¬ ¤ì°¨ë²”ìœ„ 65~75cm 2¹ø °¡¸é 1Ä­
     float mRoll=0; // ì¢Œìš° ´ë™ê±°ë¦¬ ¤ì°¨ë²”ìœ„ 70~80cm
     float mYaw=0; // Œì „
     float mThrottle=0; // í•˜
@@ -452,7 +452,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     @Override
     public void forward() {
         mPitch = (float)0;
-        mRoll = (float)1;
+        mRoll = (float)0.65;
         mYaw=0; // Œì „
         mThrottle=0; // í•˜
 //        if (null == sendVirtualStickDataTimer) {
@@ -476,7 +476,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     @Override
     public void back() {
         mPitch = (float)0;
-        mRoll = -(float)1;
+        mRoll = -(float)0.65;
         mYaw=0; // Œì „
         mThrottle=0; // í•˜
 //        if (null == sendVirtualStickDataTimer) {

@@ -4,5 +4,6 @@
     <file url="file://$PROJECT_DIR$/app/src/main/java/kr/ac/hansung/deng/app/MainActivity.java" charset="x-windows-949" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/kr/ac/hansung/deng/data/ImgDataProcess.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/kr/ac/hansung/deng/manager/CustomDroneSDKManager.java" charset="x-windows-949" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/kr/ac/hansung/deng/service/EmergencyService.java" charset="UTF-8" />
   </component>
 </project>
