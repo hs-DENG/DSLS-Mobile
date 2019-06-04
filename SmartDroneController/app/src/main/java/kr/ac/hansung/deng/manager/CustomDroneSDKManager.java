@@ -83,9 +83,9 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     private Timer sendVirtualStickDataTimer;
     private SendVirtualStickDataTask sendVirtualStickDataTask;
     float mPitch=0; // ë’¤ ´ë™ê±°ë¦¬ ¤ì°¨ë²”ìœ„ 65~75cm 2¹ø °¡¸é 1Ä­
-    float mRoll=0; // ì¢Œìš° ´ë™ê±°ë¦¬ ¤ì°¨ë²”ìœ„ 70~80cm
-    float mYaw=0; // Œì „
-    float mThrottle=0; // í•˜
+    float mRoll=0; // «ëš¯€ë£å«„ê³•â” ¼ê°è¸°ë¶¿70~80cm
+    float mYaw=0; // Ÿ¾
+    float mThrottle=0; // ê³¹ë¸¯
 
     // Codec for video live view
     protected DJICodecManager mCodecManager = null;
@@ -101,7 +101,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     // connection
     @Override
     public void connect(){
-       //TODO ¿¬°á
+       //TODO °ê²°
         Toast.makeText(mContext,"Trying Re Connect!!!",Toast.LENGTH_SHORT).show();
     }
 
@@ -109,7 +109,7 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
         //showHeight();
         if(aircraft == null || flightController == null) {
             aircraft = DJISimulatorApplication.getAircraftInstance();
-            flightController = aircraft.getFlightController();//TODO aircraft nullì²˜ë¦¬ ´ì¤˜¼í•¨
+            flightController = aircraft.getFlightController();//TODO aircraft nullï§£ì„ì¨¾³ë¸¿
             //       connect=true;
             Log.d(TAG, "Controller Connect Success!");
             if (flightController != null) {
@@ -453,8 +453,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void forward() {
         mPitch = (float)0;
         mRoll = (float)0.65;
-        mYaw=0; // Œì „
-        mThrottle=0; // í•˜
+        mYaw=0; // Ÿ¾
+        mThrottle=0; // ê³¹ë¸¯
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -477,8 +477,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void back() {
         mPitch = (float)0;
         mRoll = -(float)0.65;
-        mYaw=0; // Œì „
-        mThrottle=0; // í•˜
+        mYaw=0; // Ÿ¾
+        mThrottle=0; // ê³¹ë¸¯
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -501,8 +501,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void left() {
         mPitch = -(float)1;
         mRoll = (float)0;
-        mYaw=0; // Œì „
-        mThrottle=0; // í•˜
+        mYaw=0; // Ÿ¾
+        mThrottle=0; // ê³¹ë¸¯
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();
@@ -525,8 +525,8 @@ public class CustomDroneSDKManager implements SDKManager, TextureView.SurfaceTex
     public void right() {
         mPitch = (float)1;
         mRoll = (float)0;
-        mYaw=0; // Œì „
-        mThrottle=0; // í•˜
+        mYaw=0; // Ÿ¾
+        mThrottle=0; // ê³¹ë¸¯
 //        if (null == sendVirtualStickDataTimer) {
 //            sendVirtualStickDataTask = new SendVirtualStickDataTask();
 //            sendVirtualStickDataTimer = new Timer();

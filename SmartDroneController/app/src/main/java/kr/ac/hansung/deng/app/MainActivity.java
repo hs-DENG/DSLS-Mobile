@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Codec for video live view
 
-    // 방향
+    // 諛⑺�
     //private Button left, right, forward, back, up, down;
 
     protected TextureView mVideoSurface = null;
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
         Log.d(TAG, "mVideoSurface : " + mVideoSurface);
         if (sdkManager != null) {
-            // Main Activity �작
+            // Main Activity �옉
             droneInfoManager = DroneInfoManager.getInstance();
             droneInfoManager.init(sdkManager);
 

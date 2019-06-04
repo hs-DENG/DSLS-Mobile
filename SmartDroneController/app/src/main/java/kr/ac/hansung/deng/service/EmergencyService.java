@@ -66,7 +66,7 @@ public class EmergencyService extends Service {
                 @Override
                 public void run(){
                     // ��지 �보 받기 ( �론 �보 �비�로부
-                    // 캡쳐 ��지 모델�리�
+                    // 캡쳐 ��지 모델�리�
 
                     try {
 
@@ -81,10 +81,10 @@ public class EmergencyService extends Service {
 
 
                         float height=0;
-                        // �이 맞추�
+                        // �이 맞추�
                         while (true) {
                             if (height < 5) break;
-                            height = sdkManager.getAircraftHeight(); // �이 가�오�
+                            height = sdkManager.getAircraftHeight(); // �이 가�오�
                             sleep(2000);
                             sdkManager.down();
                             sleep(2000);
@@ -92,7 +92,7 @@ public class EmergencyService extends Service {
                         Log.d(TAG,"�이 맞추긱공! �이 : " + height);
                         height=5;
 
-                        // 카메짐볼 �리�
+                        // 카메짐볼 �리�
                         ((CustomDroneSDKManager) sdkManager).moveGimbalDownAll();
                         sleep(5000);
                         Log.d(TAG,"짐볼 �리긱공! ");
@@ -105,11 +105,11 @@ public class EmergencyService extends Service {
                         ImageDivide divide = new ImageDivide(testData, (int) height); // ��지 divide �이 만큼 divide
                         divide.cropImage(); // divide �행
                         Log.d(TAG,"��지 분할 �공");
-                        divededImages = divide.getCroppedImages(); // divide 결과 리스가�오�
+                        divededImages = divide.getCroppedImages(); // divide 결과 리스가�오�
                         Log.d(TAG,"��지 분할 결과 가�오긱공");
 
                         for (Bitmap image : divededImages) {
-                            processedImages.add(Bitmap.createScaledBitmap(image, classifier.getImageSizeX(), classifier.getImageSizeY(), true)); // 리사�즈 �서 벡터�
+                            processedImages.add(Bitmap.createScaledBitmap(image, classifier.getImageSizeX(), classifier.getImageSizeY(), true)); // 리사�즈 �서 벡터�
                             String strFolderPath = Environment.getExternalStorageDirectory() + "/Pictures/SDCResize";
 
                             File myFile = new File(strFolderPath);
@@ -161,7 +161,7 @@ public class EmergencyService extends Service {
 
                         // Log.d(TAG,"�벨 리스가�오긱공");
 
-                        //가가까운 safe zone �덱찾아가�오�
+                        //가가까운 safe zone �덱찾아가�오�
 
                         //TODO  CustomObject shortestPathDetection(labelList);
                         ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
@@ -302,6 +302,10 @@ public class EmergencyService extends Service {
                     min = labelInfo;
                 }
             }
+        }
+        if(min ==null ) {
+            min = new ImageLabelInfo("safe",2,2);
+            Log.d(TAG,"There are no safeArea ... just landing");
         }
         return min;
     }
