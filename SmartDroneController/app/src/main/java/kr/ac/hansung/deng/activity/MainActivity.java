@@ -20,20 +20,21 @@ import kr.ac.hansung.deng.smartdronecontroller.R;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private final String TAG = MainActivity.class.getSimpleName();
+
+    // SDK Driver
     private SDKManager sdkManager;
     private DroneInfoManager droneInfoManager;
+
+    // Emergency Service
     private EmergencyLandingManager emergencyLandingManager;
-    private RelativeLayout myLayout;
-    private TextView heightText;
+
+    // Component
     private ImageButton takeOffBtn, landingBtn, emergencyBtn, captureBtn;
     private ImageButton btnUp, btnDown, btnForward, btnBack, btnLeft, btnRight;
     private SeekBar mSeekBar;
+    private TextView heightText;
+
     private int touched = 0;
-
-    // Codec for video live view
-
-    // 諛⑺�
-    //private Button left, right, forward, back, up, down;
 
     protected TextureView mVideoSurface = null;
 
@@ -51,24 +52,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         this.getSupportActionBar().hide();
 
-        takeOffBtn = (ImageButton) findViewById(R.id.btn_takeoff);
-        landingBtn = (ImageButton) findViewById(R.id.btn_landing);
-        emergencyBtn = (ImageButton) findViewById(R.id.btn_emergency);
-        captureBtn = (ImageButton) findViewById(R.id.btn_capture);
-
-        btnUp = (ImageButton) findViewById(R.id.btn_up);
-        btnDown = (ImageButton) findViewById(R.id.btn_down);
-        btnForward = (ImageButton) findViewById(R.id.btn_forward);
-        btnBack = (ImageButton) findViewById(R.id.btn_back);
-        btnLeft = (ImageButton) findViewById(R.id.btn_left);
-        btnRight = (ImageButton) findViewById(R.id.btn_right);
-
         mSeekBar = (SeekBar) findViewById(R.id.seekBar);
 
         mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
         Log.d(TAG, "mVideoSurface : " + mVideoSurface);
         if (sdkManager != null) {
-            // Main Activity �옉
+            // Main Activity �옉
             droneInfoManager = DroneInfoManager.getInstance();
             droneInfoManager.init(sdkManager);
 
@@ -79,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(this, "from" + TAG + " error : SDK is Null", Toast.LENGTH_SHORT);
             finish();
         }
-
         sdkManager.getVideo(mVideoSurface);
 //        Thread th = new Thread(){
 //            @Override
@@ -132,6 +120,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
     public void initUI(){
+        takeOffBtn = (ImageButton) findViewById(R.id.btn_takeoff);
+        landingBtn = (ImageButton) findViewById(R.id.btn_landing);
+        emergencyBtn = (ImageButton) findViewById(R.id.btn_emergency);
+        captureBtn = (ImageButton) findViewById(R.id.btn_capture);
+
         btnUp = (ImageButton)findViewById(R.id.btn_up);
         btnUp.setOnClickListener(this);
         btnDown = (ImageButton)findViewById(R.id.btn_down);
@@ -213,29 +206,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         Log.e(TAG, "onDestroy");
-
-
         sdkManager.removeVideo();
         if(emergencyLandingManager.getEmergencyService().getClassifier()!= null)
             emergencyLandingManager.getEmergencyService().getClassifier().close();
-
         super.onDestroy();
+        this.finish();
     }
 
     //emergency button
     public void onClickEmergency(View view){
-//        takeOffBtn.setVisibility(View.INVISIBLE);
-//        landingBtn.setVisibility(View.INVISIBLE);
-//        emergencyBtn.setVisibility(View.INVISIBLE);
-//        captureBtn.setVisibility(View.INVISIBLE);
-//
-//        btnUp.setVisibility(View.INVISIBLE);
-//        btnDown.setVisibility(View.INVISIBLE);
-//        btnForward.setVisibility(View.INVISIBLE);
-//        btnBack.setVisibility(View.INVISIBLE);
-//        btnLeft.setVisibility(View.INVISIBLE);
-//        btnRight.setVisibility(View.INVISIBLE);
-
         //TODO Do Smart Landing
         emergencyLandingManager.runService();
     }
@@ -253,14 +232,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         sdkManager.getCapture(mVideoSurface);
     }
-
-    /*public void onClickDown(View view){
-        sdkManager.moveGimbalDownAll();
-    }
-
-    public void onClickUp(View view){
-        sdkManager.moveGimbalUpAll();
-    }*/
 
     public SDKManager getSdkManager() {
         return sdkManager;

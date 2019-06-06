@@ -89,7 +89,7 @@ public class DJISDKDriver implements SDKManager, TextureView.SurfaceTextureListe
     }
 
     public void initController(){
-        //showHeight();
+
         if(aircraft == null || flightController == null) {
             aircraft = DJISimulatorApplication.getAircraftInstance();
             flightController = aircraft.getFlightController();//TODO aircraft null泥섎�쨾�븿
@@ -114,7 +114,6 @@ public class DJISDKDriver implements SDKManager, TextureView.SurfaceTextureListe
                 flightController.setVerticalControlMode(VerticalControlMode.VELOCITY);
             }
         }
-        //   }
     }
     // drone's function
     @Override
