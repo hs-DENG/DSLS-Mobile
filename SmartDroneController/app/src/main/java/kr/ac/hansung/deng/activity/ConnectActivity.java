@@ -14,7 +14,9 @@ import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -49,6 +51,10 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE,
     };
+
+    private Spinner mySpinner;
+    private ArrayAdapter spinnerAdapter;
+
     private List<String> missingPermission = new ArrayList<>();
     //private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
     private static final int REQUEST_PERMISSION_CODE = 12345;
@@ -61,7 +67,7 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
         checkAndRequestPermissions();
         setContentView(R.layout.activity_connect);
 
-        initUI();
+        initUi();
 
         // Register the broadcast receiver for receiving the device connection's changes.
         IntentFilter filter = new IntentFilter();
@@ -217,5 +223,20 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
 
             }
         });
+    }
+
+    public void initUi(){
+        String group1 = "DJI";
+        String group2 = "Xiaomi";
+        String group3 = "Parrot";
+
+        ArrayList<String> groups = new ArrayList<>();
+        groups.add(group1);
+        groups.add(group2);
+        groups.add(group3);
+
+        mySpinner = (Spinner) findViewById(R.id.mySpinner);
+        spinnerAdapter = new ArrayAdapter(this, R.layout.item_spinner, groups);
+        mySpinner.setAdapter(spinnerAdapter);
     }
 }
