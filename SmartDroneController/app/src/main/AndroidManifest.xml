@@ -68,7 +68,7 @@
         <activity android:name="kr.ac.hansung.deng.activity.ConnectActivity"/>
 
         <activity
-            android:name="kr.ac.hansung.deng.app.MainActivity"
+            android:name="kr.ac.hansung.deng.activity.MainActivity"
             android:screenOrientation="landscape"/>
 
         <service

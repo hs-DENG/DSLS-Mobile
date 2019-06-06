@@ -26,7 +26,7 @@ import dji.sdk.sdkmanager.DJISDKManager;
  * Created by khb on 2019-04-05.
  */
 
-public class FPVApplication extends Application{
+public class FPVApplication extends Application implements SDKApplication{
 
     public static final String FLAG_CONNECTION_CHANGE = "fpv_tutorial_connection_change";
 
@@ -146,9 +146,7 @@ public class FPVApplication extends Application{
                                 componentKey,
                                 oldComponent,
                                 newComponent));
-
             }
-
         };
         //Check the permissions before registering the application for android system 6.0 above.
         int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -176,5 +174,4 @@ public class FPVApplication extends Application{
             getApplicationContext().sendBroadcast(intent);
         }
     };
-
 }

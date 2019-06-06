@@ -5,9 +5,9 @@ public class DroneInfoManager {
     public static DroneInfoManager getInstance(){return instance;}
     private DroneInfoManager(){}
 
-    private CustomDroneSDKManager sdkManager;
+    private SDKManager sdkManager;
 
-    public void init(CustomDroneSDKManager sdkManager){
+    public void init(SDKManager sdkManager){
         this.sdkManager = sdkManager;
 
 

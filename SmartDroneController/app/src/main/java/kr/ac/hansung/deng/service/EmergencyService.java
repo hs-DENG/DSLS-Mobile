@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Binder;
@@ -23,8 +22,8 @@ import java.util.List;
 
 import kr.ac.hansung.deng.ML.ImageClassifier;
 import kr.ac.hansung.deng.ML.ImageClassifierFloatInception;
-import kr.ac.hansung.deng.app.MainActivity;
-import kr.ac.hansung.deng.manager.CustomDroneSDKManager;
+import kr.ac.hansung.deng.activity.MainActivity;
+import kr.ac.hansung.deng.driver.DJISDKDriver;
 import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.model.ImageLabelInfo;
 import kr.ac.hansung.deng.util.ImageDivide;
@@ -53,7 +52,7 @@ public class EmergencyService extends Service {
     // model
     private List<ImageLabelInfo> labelInfoList = new ArrayList<ImageLabelInfo>();
     public EmergencyService() {
-        sdkManager = CustomDroneSDKManager.getInstance();
+        sdkManager = DJISDKDriver.getInstance();
     }
 
     @Override
@@ -66,25 +65,20 @@ public class EmergencyService extends Service {
                 @Override
                 public void run(){
                     // ��지 �보 받기 ( �론 �보 �비�로부
-                    // 캡쳐 ��지 모델�리�
+                    // 캡쳐 ��지 모델�리�
 
                     try {
 
                         processedImages = new ArrayList<Bitmap>();
-                        classifier = new ImageClassifierFloatInception(mainActivity);
-
-                        classifier.setNumThreads(1);
-
-                        SpannableStringBuilder textToShow = new SpannableStringBuilder();
                         //Bitmap bitmap = textureView.getBitmap(classifier.getImageSizeX(), classifier.getImageSizeY())
                         //�기카메비트맵이미�르아�성�었classifier(dengception)객체�게 �시 classifyFrame() �출�킴
 
 
                         float height=0;
-                        // �이 맞추�
+                        // �이 맞추�
                         while (true) {
                             if (height < 5) break;
-                            height = sdkManager.getAircraftHeight(); // �이 가�오�
+                            height = sdkManager.getAircraftHeight(); // �이 가�오�
                             sleep(2000);
                             sdkManager.down();
                             sleep(2000);
@@ -92,24 +86,24 @@ public class EmergencyService extends Service {
                         Log.d(TAG,"�이 맞추긱공! �이 : " + height);
                         height=5;
 
-                        // 카메짐볼 �리�
-                        ((CustomDroneSDKManager) sdkManager).moveGimbalDownAll();
+                        // 카메짐볼 �리�
+                        ((DJISDKDriver) sdkManager).moveGimbalDownAll();
                         sleep(5000);
                         Log.d(TAG,"짐볼 �리긱공! ");
 
                         //캡처
                         sdkManager.getCapture(mainActivity.getmVideoSurface());
-                        testData = ((CustomDroneSDKManager) sdkManager).getCaptureView();
+                        testData = ((DJISDKDriver) sdkManager).getCaptureView();
                         Log.d(TAG,"캡처 �공");
 
                         ImageDivide divide = new ImageDivide(testData, (int) height); // ��지 divide �이 만큼 divide
                         divide.cropImage(); // divide �행
                         Log.d(TAG,"��지 분할 �공");
-                        divededImages = divide.getCroppedImages(); // divide 결과 리스가�오�
+                        divededImages = divide.getCroppedImages(); // divide 결과 리스가�오�
                         Log.d(TAG,"��지 분할 결과 가�오긱공");
 
                         for (Bitmap image : divededImages) {
-                            processedImages.add(Bitmap.createScaledBitmap(image, classifier.getImageSizeX(), classifier.getImageSizeY(), true)); // 리사�즈 �서 벡터�
+                            processedImages.add(Bitmap.createScaledBitmap(image, 299,299, true)); // 리사�즈 �서 벡터�
                             String strFolderPath = Environment.getExternalStorageDirectory() + "/Pictures/SDCResize";
 
                             File myFile = new File(strFolderPath);
@@ -148,12 +142,16 @@ public class EmergencyService extends Service {
                         // 모델 �작
                         int count=0, row=0, col=0;
                         for(Bitmap image: processedImages){
+                            classifier = new ImageClassifierFloatInception(mainActivity);
+                            classifier.setNumThreads(1);
+                            SpannableStringBuilder textToShow = new SpannableStringBuilder();
                             classifier.classifyFrame(image, textToShow);
                             col = (int) (count % height);
                             row = (int) (count / height);
                             Log.d(TAG,"row , col = [" + row + ", " + col + "] count = " + count);
                             labelInfoList.add(new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),row,col));
                             count++;
+                            classifier.close();
                         }
                         Log.d(TAG,"리사�즈��지 �벨 분류 �공");
 
@@ -161,7 +159,7 @@ public class EmergencyService extends Service {
 
                         // Log.d(TAG,"�벨 리스가�오긱공");
 
-                        //가가까운 safe zone �덱찾아가�오�
+                        //가가까운 safe zone �덱찾아가�오�
 
                         //TODO  CustomObject shortestPathDetection(labelList);
                         ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
@@ -176,7 +174,7 @@ public class EmergencyService extends Service {
                         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
                         mPaint.setColor(Color.BLACK);
                         mPaint.setAntiAlias(true);
-                        mPaint.setAlpha(60);
+
                         //canvas.drawBitmap(testData,10,10,mPaint);
                         int safeIndex = 0;
                         int startX=0, startY=0;
@@ -208,6 +206,7 @@ public class EmergencyService extends Service {
                             startY = (safeIndex / 5) * (canvas.getHeight() / 5);
                             stopX = startX + (canvas.getWidth() / 5);
                             stopY = startY + (canvas.getHeight() / 5);
+                            mPaint.setAlpha(60);
                             canvas.drawRect(startX, startY, stopX, stopY, mPaint);
                         }
                         String strFolderPath = Environment.getExternalStorageDirectory() + "/Pictures/SDCE";
@@ -320,7 +319,9 @@ public class EmergencyService extends Service {
                 for(int i=0; i<Math.abs(centerRow - labelInfo.getRow()); i++) {
                     try {
                         Thread.sleep(2000);
-                        sdkManager.left();
+                        sdkManager.forward();
+                        Thread.sleep(2000);
+                        sdkManager.forward();
                     }catch (Exception e){
 
                     }
@@ -329,7 +330,9 @@ public class EmergencyService extends Service {
                 for(int i=0; i< Math.abs(centerRow - labelInfo.getRow()); i++) {
                     try {
                         Thread.sleep(2000);
-                        sdkManager.right();
+                        sdkManager.back();
+                        Thread.sleep(2000);
+                        sdkManager.back();
                     }catch (Exception e){
 
                     }
@@ -340,7 +343,9 @@ public class EmergencyService extends Service {
                 for(int i=0; i<Math.abs(centerCol - labelInfo.getCols()); i++) {
                     try {
                         Thread.sleep(2000);
-                        sdkManager.forward();
+                        sdkManager.left();
+                        Thread.sleep(2000);
+                        sdkManager.left();
                     }catch (Exception e){
 
                     }
@@ -349,7 +354,9 @@ public class EmergencyService extends Service {
                 for(int i=0; i<Math.abs(centerCol - labelInfo.getCols()); i++) {
                     try {
                         Thread.sleep(2000);
-                        sdkManager.back();
+                        sdkManager.right();
+                        Thread.sleep(2000);
+                        sdkManager.right();
                     }catch (Exception e){
                     }
                 }

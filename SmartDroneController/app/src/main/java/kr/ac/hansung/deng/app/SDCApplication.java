@@ -5,7 +5,6 @@ import android.content.Context;
 
 import com.secneo.sdk.Helper;
 
-import kr.ac.hansung.deng.manager.CustomDroneSDKManager;
 import kr.ac.hansung.deng.sdk.FPVApplication;
 
 /**

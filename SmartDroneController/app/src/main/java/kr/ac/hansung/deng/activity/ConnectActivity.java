@@ -22,15 +22,15 @@ import java.util.List;
 
 import dji.sdk.base.BaseProduct;
 import dji.sdk.products.Aircraft;
-import kr.ac.hansung.deng.manager.CustomDroneSDKManager;
+import kr.ac.hansung.deng.driver.DJISDKDriver;
+import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.sdk.FPVApplication;
-import kr.ac.hansung.deng.app.MainActivity;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 
 public class ConnectActivity extends Activity implements View.OnClickListener{
     private static final String TAG = ConnectActivity.class.getName();
 
-    private CustomDroneSDKManager sdkManager;
+    private SDKManager sdkManager;
 
     private Button mBtnOpen;
     private Button mBtnReConnect;
@@ -56,8 +56,8 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        sdkManager =CustomDroneSDKManager.getInstance();
-        sdkManager.setContext(this);
+        sdkManager = DJISDKDriver.getInstance();
+        ((DJISDKDriver)sdkManager).setContext(this);
         checkAndRequestPermissions();
         setContentView(R.layout.activity_connect);
 

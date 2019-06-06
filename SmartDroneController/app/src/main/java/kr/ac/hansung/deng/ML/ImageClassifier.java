@@ -250,6 +250,10 @@ public abstract class ImageClassifier {
         labelProcess = new LabelProcess(this);
         labelProcess.setLabelList(sortedLabels);
 
+        Log.d("Labeltest","label : " + labelProcess.getLabelList().get(0).getKey() + labelProcess.getLabelList().get(0).getValue());
+        Log.d("Labeltest","label : " + labelProcess.getLabelList().size());
+
+
     }
 
     /**

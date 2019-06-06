@@ -3,7 +3,7 @@ package kr.ac.hansung.deng.manager;
 
 import android.content.Intent;
 
-import kr.ac.hansung.deng.app.MainActivity;
+import kr.ac.hansung.deng.activity.MainActivity;
 import kr.ac.hansung.deng.service.EmergencyService;
 
 public class EmergencyLandingManager{
@@ -14,11 +14,11 @@ public class EmergencyLandingManager{
 
     private EmergencyService emergencyService;
 
-    private CustomDroneSDKManager sdkManager;
+    private SDKManager sdkManager;
 
     private MainActivity mainActivity;
 
-    public void init(CustomDroneSDKManager sdkManager){
+    public void init(SDKManager sdkManager){
         this.sdkManager = sdkManager;
 
 

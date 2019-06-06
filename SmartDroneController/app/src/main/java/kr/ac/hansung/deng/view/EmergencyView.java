@@ -93,5 +93,4 @@ public class EmergencyView extends View {
             canvas.drawRect(startX, startY, stopX, stopY, mPaint);
         }
     }
-
 }
