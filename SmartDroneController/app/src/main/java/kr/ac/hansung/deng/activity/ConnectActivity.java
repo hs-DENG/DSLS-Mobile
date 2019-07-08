@@ -7,15 +7,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.media.Image;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -36,6 +42,14 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
 
     private Button mBtnOpen;
     private Button mBtnReConnect;
+
+    private LinearLayout myLayout;
+    private ImageButton mBtnMenu;
+    private PopupWindow popup;
+    private View popupView;
+    private Button mBtnOk;
+    private String company="";
+
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.VIBRATE,
             Manifest.permission.INTERNET,
@@ -67,7 +81,7 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
         checkAndRequestPermissions();
         setContentView(R.layout.activity_connect);
 
-        initUi();
+        initUI();
 
         // Register the broadcast receiver for receiving the device connection's changes.
         IntentFilter filter = new IntentFilter();
@@ -149,12 +163,52 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
 
     private void initUI() {
 
+        myLayout = (LinearLayout) findViewById(R.id.myLayout);
+        mBtnMenu = (ImageButton) findViewById(R.id.menuButton);
+
         mBtnOpen = (Button) findViewById(R.id.btn_open);
         mBtnOpen.setOnClickListener(this);
         mBtnOpen.setEnabled(false
         );
         mBtnReConnect = (Button)findViewById(R.id.btn_reConnect);
         mBtnReConnect.setOnClickListener(this);
+
+
+        String group1 = "DJI";
+        String group2 = "Xiaomi";
+        String group3 = "Parrot";
+
+        ArrayList<String> groups = new ArrayList<>();
+        groups.add(group1);
+        groups.add(group2);
+        groups.add(group3);
+
+        mySpinner = (Spinner) findViewById(R.id.mySpinner);
+        spinnerAdapter = new ArrayAdapter(this, R.layout.item_spinner, groups);
+        mySpinner.setAdapter(spinnerAdapter);
+
+        mySpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(mySpinner.getItemAtPosition(position).equals("DJI"))
+                    company = "DJI";
+                else if(mySpinner.getItemAtPosition(position).equals("Xiaomi"))
+                    company = "Xiaomi";
+                else if(mySpinner.getItemAtPosition(position).equals("Parrot"))
+                    company = "Parrot";
+            }
+        });
+
+        popupView = View.inflate(this, R.layout.dialog_activity, null);
+        popup = new PopupWindow(popupView, 1000, 1000, true);
+
+        mBtnOk = (Button) popupView.findViewById(R.id.okButton);
+        mBtnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popup.dismiss();
+            }
+        });
     }
 
     protected BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -225,18 +279,11 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
         });
     }
 
-    public void initUi(){
-        String group1 = "DJI";
-        String group2 = "Xiaomi";
-        String group3 = "Parrot";
+    public void mOnClickMenu(View view){
+        popup.showAtLocation(myLayout, Gravity.CENTER, 0, 0);
+        popup.setAnimationStyle(-1);
+        popup.showAsDropDown(mBtnMenu);
 
-        ArrayList<String> groups = new ArrayList<>();
-        groups.add(group1);
-        groups.add(group2);
-        groups.add(group3);
-
-        mySpinner = (Spinner) findViewById(R.id.mySpinner);
-        spinnerAdapter = new ArrayAdapter(this, R.layout.item_spinner, groups);
-        mySpinner.setAdapter(spinnerAdapter);
     }
+
 }
