@@ -1,6 +1,6 @@
 
 # Automatic Safe Landing System Using Image Classification
-#### 1. Project Details
+#### 1. Project Overview
 #### 2. Build to System Environment
 #### 3. Function
 #### 4. Training
@@ -10,7 +10,7 @@
 <br>
 <br>
 
-## 1.Project Details
+## 1.Project Overview
 1-1 프로젝트 정의 <br> 
 <ul>
 &nbsp; ●DSLS는 사용자가 드론을 안전하게 착륙시키기 어려운 환경에서 작동하는 시스템입니다. <br>
