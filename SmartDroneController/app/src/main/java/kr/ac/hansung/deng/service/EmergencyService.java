@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Binder;
@@ -18,6 +19,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import kr.ac.hansung.deng.ML.ImageClassifier;
@@ -27,6 +30,8 @@ import kr.ac.hansung.deng.driver.DJISDKDriver;
 import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.model.ImageLabelInfo;
 import kr.ac.hansung.deng.util.ImageDivide;
+import kr.ac.hansung.deng.util.LandingController;
+import kr.ac.hansung.deng.util.ResultDrawer;
 
 import static java.lang.Thread.sleep;
 
@@ -53,14 +58,20 @@ public class EmergencyService extends Service {
     private final static int safeArea = Color.GREEN;
     private final static int unsafeArea = Color.RED;
 
-    // reference for calc shortest path
-    int count=0, row=0, cols =0;
-
     // model
     private List<ImageLabelInfo> labelInfoList = new ArrayList<ImageLabelInfo>();
     public EmergencyService() {
         sdkManager = DJISDKDriver.getInstance();
     }
+    private SpannableStringBuilder textToShow = new SpannableStringBuilder();
+
+    //
+    private Graph graph;
+    private float height=0;
+    private LandingController landingController = new LandingController();
+    private boolean landing = false;
+    private ResultDrawer resultDrawer;
+    private ImageLabelInfo safeLabel;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -71,7 +82,7 @@ public class EmergencyService extends Service {
                 public void run(){
                     try {
                         processedImages = new ArrayList<Bitmap>();
-                        float height=0;
+
                         while (true) {
                             if (height < 5) break;
                             height = sdkManager.getAircraftHeight(); // �이 가�오�
@@ -79,56 +90,71 @@ public class EmergencyService extends Service {
                             sdkManager.down();
                             sleep(2000);
                         }
+
                         height=5;
+
+                        graph = new Graph((int)(height*height));
 
                         // 카메짐볼 �리�
                         ((DJISDKDriver) sdkManager).moveGimbalDownAll();
                         sleep(5000);
                         Log.d(TAG,"camera gimbal down all");
+
                         //캡처
                         sdkManager.getCapture(mainActivity.getmVideoSurface());
                         testData = ((DJISDKDriver) sdkManager).getCaptureView();
                         Log.d(TAG,"using camera capture function for get area data");
 
                         ImageDivide divide = new ImageDivide(testData, (int) height); // ��지 divide �이 만큼 divide
+
                         divide.cropImage(); // divide �행
+
                         divededImages = divide.getCroppedImages(); // divide 결과 리스가�오�
+
                         Log.d(TAG,"area data divide");
 
                         for (Bitmap image : divededImages) {
                             processedImages.add(Bitmap.createScaledBitmap(image, 299,299, true)); // 리사�즈 �서 벡터�
                         }
 
-                        // 모델 �작
+                        for(int i=0; i < height*height ; i++){
+                            if(i > 0 && i % height != 0 )
+                                graph.addEdge(i, i - 1);
 
-                        for(Bitmap image: processedImages){
-                            classifier = new ImageClassifierFloatInception(mainActivity);
-                            classifier.setNumThreads(1);
-                            SpannableStringBuilder textToShow = new SpannableStringBuilder();
-                            classifier.classifyFrame(image, textToShow);
-                            cols = (int) (count % height);
-                            row = (int) (count / height);
-                            Log.d(TAG,"row , col = [" + row + ", " + cols + "] count = " + count);
-                            labelInfoList.add(new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),row,cols));
-                            count++;
-                            classifier.close();
+                            if(i < height*height && i % height != height -1 )
+                                graph.addEdge(i, i+1);
+
+                            if(i-height > 0)
+                                graph.addEdge(i, (int)(i-height));
+
+                            if(i+height < height*height)
+                                graph.addEdge(i, (int)(i+height));
                         }
 
+                        classifier = new ImageClassifierFloatInception(mainActivity);
+                        classifier.setNumThreads(1);
+
+
+                        graph.runBFS((int)(height/2),classifier, processedImages);
+                        // 모델 �작
+
+
                         //CustomObject shortestPathDetection(labelList);
-                        ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
+                        //ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
 
                         //safe/unsafe
-                        drawAreaSection();
+                        resultDrawer = new ResultDrawer();
+                        resultDrawer.drawAreaSection(mainActivity, (int)height, testData, labelInfoList);
 
                         // Landing
 
                         // Calculate Shortest Path ( with greedy algorythm)
-                        smartLanding(labelInfo,labelInfoList);
+                        //landingController.smartLanding((int)height,labelInfoList);
 
                         // Release Resources
-                        count = row = cols = 0 ;
 
                         testData.recycle();
+
                         for (Bitmap image : divededImages) {
                             image.recycle();
                         }
@@ -156,178 +182,6 @@ public class EmergencyService extends Service {
         if(mThread != null)
             mThread = null;
     }
-    public ImageLabelInfo shortestPathDetection(List<ImageLabelInfo> imageLabelInfo){
-        int center = imageLabelInfo.size() / 2 ;
-        int centerRow = imageLabelInfo.get(center).getRow();
-        int centerCols = imageLabelInfo.get(center).getCols();
-
-        ImageLabelInfo min = null;//TODO 모두가 unsafe 경우 �외처리르야
-        double shortestPath = 1000;
-        Log.d(TAG, "imageLabelInfo size : " + imageLabelInfo.size());
-        // 최단 경로 계산
-        for(int i=0;i<imageLabelInfo.size();i++){
-            ImageLabelInfo labelInfo = imageLabelInfo.get(i);
-            Log.d(TAG, "image Label Info row cols = [" + imageLabelInfo.get(i).getRow() + ", " + imageLabelInfo.get(i).getCols() + "]");
-            Log.d(TAG,"label : " + labelInfo.getKey());
-        }
-        for(ImageLabelInfo labelInfo : imageLabelInfo){
-            if(labelInfo.getKey().equals("safe")){
-                if(shortestPath > (Math.abs(labelInfo.getRow() - centerRow) + Math.abs(labelInfo.getCols() - centerCols))){
-
-                    shortestPath = (Math.abs(labelInfo.getRow() - centerRow) + Math.abs(labelInfo.getCols() - centerCols));
-                    Log.d(TAG,"Shortest Path : " + shortestPath);
-                    min = labelInfo;
-                }
-            }
-        }
-        if(min ==null ) {
-            min = new ImageLabelInfo("safe",2,2);
-            Log.d(TAG,"There are no safeArea ... just landing");
-        }
-        return min;
-    }
-    public void drawAreaSection(){
-        canvas = new Canvas(testData);
-
-        Paint mPaint;
-
-        mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaint.setColor(line);
-        mPaint.setAntiAlias(true);
-
-        //canvas.drawBitmap(testData,10,10,mPaint);
-        int safeIndex = 0;
-        int startX=0, startY=0;
-        int stopX=0, stopY=0, startWidth =0, startHeight =0, stopWidth= 0, stopHeight = 0;
-        for(int i=0; i<4; i++){
-            startWidth = 0;
-            startHeight = (testData.getHeight() / 5) * (i+1);
-            stopWidth = testData.getWidth();
-            stopHeight = (testData.getHeight() / 5) * (i+1);
-            canvas.drawLine(startWidth, startHeight, stopWidth, stopHeight, mPaint);
-        }
-        for(int i=0; i<4; i++){
-            startWidth = (testData.getWidth() / 5) * (i+1);
-            startHeight = 0;
-            stopWidth = (testData.getWidth() / 5) * (i+1);
-            stopHeight = testData.getHeight();
-            canvas.drawLine(startWidth,startHeight,stopWidth,stopHeight, mPaint);
-        }
-
-        for (ImageLabelInfo label : labelInfoList) {
-            if (label.getKey().equals("safe")) {
-                mPaint.setColor(safeArea);
-            }
-            else {
-                mPaint.setColor(unsafeArea);
-            }
-            safeIndex = labelInfoList.indexOf(label);
-            startX = (safeIndex % 5) * (canvas.getWidth() / 5);
-            startY = (safeIndex / 5) * (canvas.getHeight() / 5);
-            stopX = startX + (canvas.getWidth() / 5);
-            stopY = startY + (canvas.getHeight() / 5);
-            mPaint.setAlpha(60);
-            canvas.drawRect(startX, startY, stopX, stopY, mPaint);
-        }
-        String strFolderPath = Environment.getExternalStorageDirectory() + "/Pictures/SDCE";
-
-        File myFile = new File(strFolderPath);
-
-        if(!myFile.exists()) {
-            myFile.mkdirs();
-        }
-
-        FileOutputStream fos;
-
-        String strFilePath = strFolderPath + "/" + System.currentTimeMillis() + ".png";
-        File fileCacheItem = new File(strFilePath);
-
-        try {
-            fos = new FileOutputStream(fileCacheItem);
-            testData.compress(Bitmap.CompressFormat.PNG, 100, fos);
-
-            //this code will scan the image so that it will appear in your gallery when you open next time
-            MediaScannerConnection.scanFile(mainActivity, new String[] { fileCacheItem.toString() }, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                        public void onScanCompleted(String path, Uri uri) {
-                            Log.d("appname", "image is saved in gallery and gallery is refreshed.");
-                        }
-                    }
-            );
-
-            mainActivity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-                    Uri.parse("file://"+ strFilePath)));
-            Log.d("EmergencyView","capture success");
-            Log.d("EmergencyView", strFilePath);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-    public void smartLanding(ImageLabelInfo labelInfo, List<ImageLabelInfo> imageLabelInfo){
-        int center = imageLabelInfo.size() / 2 ;
-        int centerRow = imageLabelInfo.get(center).getRow();
-        int centerCols = imageLabelInfo.get(center).getCols();
-
-        if(labelInfo != null){
-            if(centerRow > labelInfo.getRow()){
-                for(int i=0; i<Math.abs(centerRow - labelInfo.getRow()); i++) {
-                    try {
-                        Thread.sleep(2000);
-                        sdkManager.forward();
-                        Thread.sleep(2000);
-                        sdkManager.forward();
-                    }catch (Exception e){
-
-                    }
-                }
-            }else if (centerRow < labelInfo.getRow()){
-                for(int i=0; i< Math.abs(centerRow - labelInfo.getRow()); i++) {
-                    try {
-                        Thread.sleep(2000);
-                        sdkManager.back();
-                        Thread.sleep(2000);
-                        sdkManager.back();
-                    }catch (Exception e){
-
-                    }
-                }
-            }
-
-            if(centerCols > labelInfo.getCols()){
-                for(int i=0; i<Math.abs(centerCols - labelInfo.getCols()); i++) {
-                    try {
-                        Thread.sleep(2000);
-                        sdkManager.left();
-                        Thread.sleep(2000);
-                        sdkManager.left();
-                    }catch (Exception e){
-
-                    }
-                }
-            } else if (centerCols < labelInfo.getCols()) {
-                for(int i=0; i<Math.abs(centerCols - labelInfo.getCols()); i++) {
-                    try {
-                        Thread.sleep(2000);
-                        sdkManager.right();
-                        Thread.sleep(2000);
-                        sdkManager.right();
-                    }catch (Exception e){
-                    }
-                }
-            }
-            try {
-                sleep(3000);
-                sdkManager.landing();
-
-            }catch (Exception e){
-
-            }
-        }
-    }
 
     public class MyBinder extends Binder {
         public EmergencyService getService(){
@@ -346,10 +200,115 @@ public class EmergencyService extends Service {
 
     public void setActivity(MainActivity activity){
         this.mainActivity = activity;
-
     }
 
     public ImageClassifier getClassifier() {
         return classifier;
+    }
+
+    class Graph {
+        /* 인접 리스트를 이용한 방향성 있는 그래프 클래스 */
+
+        private int V; // 노드의 개수
+        private LinkedList<Integer> adj[]; // 인접 리스트
+
+
+        /** 생성자 */
+        public Graph(int v) {
+            V = v;
+            adj = new LinkedList[v];
+            for (int i=0; i<v; ++i) // 인접 리스트 초기화
+                adj[i] = new LinkedList();
+        }
+
+        /** 노드를 연결 v->w */
+        public void addEdge(int v, int w) { adj[v].add(w); }
+
+        public void addEdgeBidirection(int v, int w){
+            adj[v].add(w);
+            adj[w].add(v);
+        }
+        /** s를 시작 노드으로 한 BFS로 탐색하면서 탐색한 노드들을 출력 */
+
+        public void runBFS(int edge, ImageClassifier classifier, List<Bitmap> processedImg){
+            boolean visited[] = new boolean[V];
+            // BFS 구현을 위한 큐(Queue) 생성
+            LinkedList<Integer> queue = new LinkedList<Integer>();
+
+            // 현재 노드를 방문한 것으로 표시하고 큐에 삽입(enqueue)
+            visited[edge] = true;
+
+            queue.add(edge);
+
+            // 큐(Queue)가 빌 때까지 반복
+            while (queue.size() != 0) {
+                // 방문한 노드를 큐에서 추출(dequeue)하고 값을 출력
+                edge = queue.poll();
+
+                // 방문한 노드와 인접한 모든 노드를 가져온다.
+                Iterator<Integer> i = adj[edge].listIterator();
+                while (i.hasNext()) {
+                    int n = i.next();
+                    // 방문하지 않은 노드면 방문한 것으로 표시하고 큐에 삽입(enqueue)
+                    if (!visited[n]) {
+
+                        visited[n] = true;
+
+                        queue.add(n);
+
+                        classifier.classifyFrame(processedImages.get(edge), textToShow);
+
+                        ImageLabelInfo label = new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),(int)(edge/height),(int)(edge%height));
+
+                        if(label.getKey().equals("safe") && landing == false){
+                            safeLabel = label;
+                            landingController.setSdkManager(sdkManager);
+
+                            landingController.setHeight((int)height);
+                            landingController.setLabelInfo(label);
+
+                            landingController.run();
+
+                            landing = true;
+                        }
+
+                        labelInfoList.add(label);
+
+                    }
+                }
+
+            }
+            landing = false;
+
+        }
+
+        public void BFS(int s) {
+            // 노드의 방문 여부 판단 (초깃값: false)
+            boolean visited[] = new boolean[V];
+            // BFS 구현을 위한 큐(Queue) 생성
+            LinkedList<Integer> queue = new LinkedList<Integer>();
+
+            // 현재 노드를 방문한 것으로 표시하고 큐에 삽입(enqueue)
+            visited[s] = true;
+            queue.add(s);
+
+            // 큐(Queue)가 빌 때까지 반복
+            while (queue.size() != 0) {
+                // 방문한 노드를 큐에서 추출(dequeue)하고 값을 출력
+                s = queue.poll();
+                System.out.print(s + " ");
+
+                // 방문한 노드와 인접한 모든 노드를 가져온다.
+                Iterator<Integer> i = adj[s].listIterator();
+                while (i.hasNext()) {
+                    int n = i.next();
+                    // 방문하지 않은 노드면 방문한 것으로 표시하고 큐에 삽입(enqueue)
+                    if (!visited[n]) {
+                        visited[n] = true;
+                        queue.add(n);
+                    }
+                }
+            }
+        }
     }
 }
