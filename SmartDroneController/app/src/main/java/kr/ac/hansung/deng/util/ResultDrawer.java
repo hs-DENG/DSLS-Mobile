@@ -64,7 +64,8 @@ public class ResultDrawer {
                     mPaint.setColor(landingArea);
                     landing = true;
                 }
-                mPaint.setColor(safeArea);
+                else
+                    mPaint.setColor(safeArea);
             }
             else {
                 mPaint.setColor(unsafeArea);

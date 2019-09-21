@@ -121,7 +121,7 @@ public class EmergencyService extends Service {
                                 graph.addEdge(i, (int)(i+height));
                         }
 
-                        graph.runBFS((int)(height/2),classifier, processedImages);
+                        graph.runBFS((int)((height*height)/2),classifier, processedImages);
                         // 모델 �작
 
 
