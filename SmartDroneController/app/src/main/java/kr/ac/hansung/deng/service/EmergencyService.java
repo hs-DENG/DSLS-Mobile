@@ -5,19 +5,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Binder;
-import android.os.Environment;
 import android.os.IBinder;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,8 +24,6 @@ import kr.ac.hansung.deng.model.ImageLabelInfo;
 import kr.ac.hansung.deng.util.ImageDivide;
 import kr.ac.hansung.deng.util.LandingController;
 import kr.ac.hansung.deng.util.ResultDrawer;
-
-import static java.lang.Thread.sleep;
 
 public class EmergencyService extends Service {
 
@@ -63,7 +53,7 @@ public class EmergencyService extends Service {
     public EmergencyService() {
         sdkManager = DJISDKDriver.getInstance();
     }
-    private SpannableStringBuilder textToShow = new SpannableStringBuilder();
+    private SpannableStringBuilder textToShow;
 
     //
     private Graph graph;
@@ -130,10 +120,6 @@ public class EmergencyService extends Service {
                             if(i+height < height*height)
                                 graph.addEdge(i, (int)(i+height));
                         }
-
-                        classifier = new ImageClassifierFloatInception(mainActivity);
-                        classifier.setNumThreads(1);
-
 
                         graph.runBFS((int)(height/2),classifier, processedImages);
                         // 모델 �작
@@ -228,6 +214,7 @@ public class EmergencyService extends Service {
             adj[v].add(w);
             adj[w].add(v);
         }
+
         /** s를 시작 노드으로 한 BFS로 탐색하면서 탐색한 노드들을 출력 */
 
         public void runBFS(int edge, ImageClassifier classifier, List<Bitmap> processedImg){
@@ -244,6 +231,32 @@ public class EmergencyService extends Service {
             while (queue.size() != 0) {
                 // 방문한 노드를 큐에서 추출(dequeue)하고 값을 출력
                 edge = queue.poll();
+                try {
+                    classifier = new ImageClassifierFloatInception(mainActivity);
+                    classifier.setNumThreads(1);
+                    textToShow = new SpannableStringBuilder();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                classifier.classifyFrame(processedImages.get(edge), textToShow);
+
+                ImageLabelInfo label = new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),(int)(edge/height),(int)(edge%height));
+                Log.d(TAG,"row : " + label.getRow() + ", cols : " + label.getCols() + ", value : " + label.getKey() + ", edge : " + edge);
+                if(label.getKey().equals("safe") && landing == false){
+                    safeLabel = label;
+                    landingController.setSdkManager(sdkManager);
+
+                    landingController.setHeight((int)height);
+                    landingController.setLabelInfo(label);
+
+                    landingController.run();
+
+                    landing = true;
+                }
+
+                classifier.close();
+                labelInfoList.add(label);
 
                 // 방문한 노드와 인접한 모든 노드를 가져온다.
                 Iterator<Integer> i = adj[edge].listIterator();
@@ -255,60 +268,40 @@ public class EmergencyService extends Service {
                         visited[n] = true;
 
                         queue.add(n);
-
-                        classifier.classifyFrame(processedImages.get(edge), textToShow);
-
-                        ImageLabelInfo label = new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),(int)(edge/height),(int)(edge%height));
-
-                        if(label.getKey().equals("safe") && landing == false){
-                            safeLabel = label;
-                            landingController.setSdkManager(sdkManager);
-
-                            landingController.setHeight((int)height);
-                            landingController.setLabelInfo(label);
-
-                            landingController.run();
-
-                            landing = true;
-                        }
-
-                        labelInfoList.add(label);
-
                     }
                 }
 
             }
             landing = false;
-
         }
 
-        public void BFS(int s) {
-            // 노드의 방문 여부 판단 (초깃값: false)
-            boolean visited[] = new boolean[V];
-            // BFS 구현을 위한 큐(Queue) 생성
-            LinkedList<Integer> queue = new LinkedList<Integer>();
-
-            // 현재 노드를 방문한 것으로 표시하고 큐에 삽입(enqueue)
-            visited[s] = true;
-            queue.add(s);
-
-            // 큐(Queue)가 빌 때까지 반복
-            while (queue.size() != 0) {
-                // 방문한 노드를 큐에서 추출(dequeue)하고 값을 출력
-                s = queue.poll();
-                System.out.print(s + " ");
-
-                // 방문한 노드와 인접한 모든 노드를 가져온다.
-                Iterator<Integer> i = adj[s].listIterator();
-                while (i.hasNext()) {
-                    int n = i.next();
-                    // 방문하지 않은 노드면 방문한 것으로 표시하고 큐에 삽입(enqueue)
-                    if (!visited[n]) {
-                        visited[n] = true;
-                        queue.add(n);
-                    }
-                }
-            }
-        }
+//        public void BFS(int s) {
+//            // 노드의 방문 여부 판단 (초깃값: false)
+//            boolean visited[] = new boolean[V];
+//            // BFS 구현을 위한 큐(Queue) 생성
+//            LinkedList<Integer> queue = new LinkedList<Integer>();
+//
+//            // 현재 노드를 방문한 것으로 표시하고 큐에 삽입(enqueue)
+//            visited[s] = true;
+//            queue.add(s);
+//
+//            // 큐(Queue)가 빌 때까지 반복
+//            while (queue.size() != 0) {
+//                // 방문한 노드를 큐에서 추출(dequeue)하고 값을 출력
+//                s = queue.poll();
+//                System.out.print(s + " ");
+//
+//                // 방문한 노드와 인접한 모든 노드를 가져온다.
+//                Iterator<Integer> i = adj[s].listIterator();
+//                while (i.hasNext()) {
+//                    int n = i.next();
+//                    // 방문하지 않은 노드면 방문한 것으로 표시하고 큐에 삽입(enqueue)
+//                    if (!visited[n]) {
+//                        visited[n] = true;
+//                        queue.add(n);
+//                    }
+//                }
+//            }
+//        }
     }
 }

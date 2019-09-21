@@ -25,6 +25,9 @@ public class ResultDrawer {
     private final static int line = Color.BLACK;
     private final static int safeArea = Color.GREEN;
     private final static int unsafeArea = Color.RED;
+    private final static int landingArea = Color.YELLOW;
+
+    private boolean landing = false;
 
     public void drawAreaSection(Context mainActivity, int height, Bitmap testData, List<ImageLabelInfo> labelInfoList){
 
@@ -57,14 +60,17 @@ public class ResultDrawer {
 
         for (ImageLabelInfo label : labelInfoList) {
             if (label.getKey().equals("safe")) {
+                if(!landing){
+                    mPaint.setColor(landingArea);
+                    landing = true;
+                }
                 mPaint.setColor(safeArea);
             }
             else {
                 mPaint.setColor(unsafeArea);
             }
-            safeIndex = labelInfoList.indexOf(label);
-            startX = (safeIndex % height) * (canvas.getWidth() / height);
-            startY = (safeIndex / height) * (canvas.getHeight() / height);
+            startX = label.getCols() * (canvas.getWidth() / height);
+            startY = label.getRow() * (canvas.getHeight() / height);
             stopX = startX + (canvas.getWidth() / height);
             stopY = startY + (canvas.getHeight() / height);
             mPaint.setAlpha(60);
