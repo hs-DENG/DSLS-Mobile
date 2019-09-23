@@ -22,6 +22,7 @@ import java.util.List;
 
 import kr.ac.hansung.deng.ML.ImageClassifier;
 import kr.ac.hansung.deng.ML.ImageClassifierFloatInception;
+import kr.ac.hansung.deng.ML.SafeImageClassifier;
 import kr.ac.hansung.deng.activity.MainActivity;
 import kr.ac.hansung.deng.driver.DJISDKDriver;
 import kr.ac.hansung.deng.manager.SDKManager;
@@ -45,7 +46,7 @@ public class EmergencyService extends Service {
     private Bitmap testData;
     private List<Bitmap> divededImages;
     private List<Bitmap> processedImages;
-    private ImageClassifier classifier;
+    private ImageClassifier classifier , safeClassifier;
 
     // tool for drawing divided section of safe/unsafe information
     private Canvas canvas;
@@ -116,6 +117,14 @@ public class EmergencyService extends Service {
 
                         //CustomObject shortestPathDetection(labelList);
                         ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
+
+                        //
+                        safeClassifier = new SafeImageClassifier(mainActivity);
+                        safeClassifier.setNumThreads(1);
+                        SpannableStringBuilder textToShow = new SpannableStringBuilder();
+                        classifier.classifyFrame(labelInfo.getImage(), textToShow);
+                        String landingAreaClass = classifier.getLabelProcess().getLabelList().get(0).getKey();
+
 
                         //safe/unsafe
                         drawAreaSection();

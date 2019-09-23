@@ -4,7 +4,7 @@ import android.app.Activity;
 
 import java.io.IOException;
 
-public class ImageClassifierFloatInception extends ImageClassifier {
+public class SafeImageClassifier extends ImageClassifier {
 
     /**
      * The inception net requires additional normalization of the used input.
@@ -23,7 +23,7 @@ public class ImageClassifierFloatInception extends ImageClassifier {
      *
      * @param activity
      */
-    public ImageClassifierFloatInception(Activity activity) throws IOException {
+    public SafeImageClassifier(Activity activity) throws IOException {
         super(activity);
         labelProbArray = new float[1][getNumLabels()];
     }

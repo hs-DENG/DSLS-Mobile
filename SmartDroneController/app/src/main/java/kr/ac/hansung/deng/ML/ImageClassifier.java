@@ -34,36 +34,56 @@ public abstract class ImageClassifier {
     private static final float GOOD_PROB_THRESHOLD = 0.3f;
     private static final int SMALL_COLOR = 0xffddaa88;
 
-    /** Tag for the {@link Log}. */
+    /**
+     * Tag for the {@link Log}.
+     */
     private static final String TAG = "TfLiteCameraDemo";
 
-    /** Number of results to show in the UI. */
+    /**
+     * Number of results to show in the UI.
+     */
     private static final int RESULTS_TO_SHOW = 3;
 
-    /** Dimensions of inputs. */
+    /**
+     * Dimensions of inputs.
+     */
     private static final int DIM_BATCH_SIZE = 1;
 
     private static final int DIM_PIXEL_SIZE = 3;
 
-    /** Preallocated buffers for storing image data in. */
+    /**
+     * Preallocated buffers for storing image data in.
+     */
     private int[] intValues = new int[getImageSizeX() * getImageSizeY()];
 
-    /** Options for configuring the Interpreter. */
+    /**
+     * Options for configuring the Interpreter.
+     */
     private final Interpreter.Options tfliteOptions = new Interpreter.Options();
 
-    /** The loaded TensorFlow Lite model. */
+    /**
+     * The loaded TensorFlow Lite model.
+     */
     private MappedByteBuffer tfliteModel;
 
-    /** An instance of the driver class to run model inference with Tensorflow Lite. */
+    /**
+     * An instance of the driver class to run model inference with Tensorflow Lite.
+     */
     protected Interpreter tflite;
 
-    /** Labels corresponding to the output of the vision model. */
+    /**
+     * Labels corresponding to the output of the vision model.
+     */
     private List<String> labelList;
 
-    /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
+    /**
+     * A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs.
+     */
     protected ByteBuffer imgData = null;
 
-    /** multi-stage low pass filter * */
+    /**
+     * multi-stage low pass filter *
+     */
     private float[][] filterLabelProbArray = null;
 
     private static final int FILTER_STAGES = 3;
@@ -83,11 +103,15 @@ public abstract class ImageClassifier {
                         }
                     });
 
-    /** holds a gpu delegate */
+    /**
+     * holds a gpu delegate
+     */
     Delegate gpuDelegate = null;
 
 
-    /** Initializes an {@code ImageClassifier}. */
+    /**
+     * Initializes an {@code ImageClassifier}.
+     */
     public ImageClassifier(Activity activity) throws IOException {
         tfliteModel = loadModelFile(activity);
         tflite = new Interpreter(tfliteModel, tfliteOptions);
@@ -104,7 +128,9 @@ public abstract class ImageClassifier {
         Log.d(TAG, "Created a Tensorflow Lite Image Classifier.");
     }
 
-    /** Classifies a frame from the preview stream. */
+    /**
+     * Classifies a frame from the preview stream.
+     */
     public void classifyFrame(Bitmap bitmap, SpannableStringBuilder builder) {
         if (tflite == null) {
             Log.e(TAG, "Image classifier has not been initialized; Skipped.");
@@ -185,14 +211,18 @@ public abstract class ImageClassifier {
         recreateInterpreter();
     }
 
-    /** Closes tflite to release resources. */
+    /**
+     * Closes tflite to release resources.
+     */
     public void close() {
         tflite.close();
         tflite = null;
         tfliteModel = null;
     }
 
-    /** Reads label list from Assets. */
+    /**
+     * Reads label list from Assets.
+     */
     private List<String> loadLabelList(Activity activity) throws IOException {
         List<String> labelList = new ArrayList<String>();
         BufferedReader reader =
@@ -205,7 +235,9 @@ public abstract class ImageClassifier {
         return labelList;
     }
 
-    /** Memory-map the model file in Assets. */
+    /**
+     * Memory-map the model file in Assets.
+     */
     private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
         AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(getModelPath());
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
@@ -215,7 +247,9 @@ public abstract class ImageClassifier {
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
-    /** Writes Image data into a {@code ByteBuffer}. */
+    /**
+     * Writes Image data into a {@code ByteBuffer}.
+     */
     private void convertBitmapToByteBuffer(Bitmap bitmap) {
         if (imgData == null) {
             return;
@@ -236,7 +270,9 @@ public abstract class ImageClassifier {
         Log.d(TAG, "Timecost to put values into ByteBuffer: " + Long.toString(endTime - startTime));
     }
 
-    /** Prints top-K labels, to be shown in UI as the results. */
+    /**
+     * Prints top-K labels, to be shown in UI as the results.
+     */
     private void printTopKLabels(SpannableStringBuilder builder) {
         for (int i = 0; i < getNumLabels(); ++i) {
             sortedLabels.add(
@@ -250,8 +286,8 @@ public abstract class ImageClassifier {
         labelProcess = new LabelProcess(this);
         labelProcess.setLabelList(sortedLabels);
 
-        Log.d("Labeltest","label : " + labelProcess.getLabelList().get(0).getKey() + labelProcess.getLabelList().get(0).getValue());
-        Log.d("Labeltest","label : " + labelProcess.getLabelList().size());
+        Log.d("Labeltest", "label : " + labelProcess.getLabelList().get(0).getKey() + labelProcess.getLabelList().get(0).getValue());
+        Log.d("Labeltest", "label : " + labelProcess.getLabelList().size());
 
 
     }
@@ -321,6 +357,9 @@ public abstract class ImageClassifier {
      *
      * @return
      */
+
+
+
     public abstract float getNormalizedProbability(int labelIndex);
 
     /**
@@ -342,8 +381,7 @@ public abstract class ImageClassifier {
     }
 
 
-
-    public Map.Entry<String, Float> getLabel(){
+    public Map.Entry<String, Float> getLabel() {
         return this.label;
     }
 

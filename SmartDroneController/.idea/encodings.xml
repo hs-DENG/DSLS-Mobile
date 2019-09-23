@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="Encoding" addBOMForNewFiles="with NO BOM">
-    <file url="file://$PROJECT_DIR$/app/src/main/java/kr/ac/hansung/deng/activity/MainActivity.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/kr/ac/hansung/deng/data/ImgDataProcess.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/kr/ac/hansung/deng/driver/DJISDKDriver.java" charset="x-windows-949" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/kr/ac/hansung/deng/service/EmergencyService.java" charset="UTF-8" />
-  </component>
-</project>
