@@ -62,7 +62,6 @@ public class EmergencyService extends Service {
     private LandingController landingController = new LandingController();
     private boolean landing = false;
     private ResultDrawer resultDrawer;
-    private ImageLabelInfo safeLabel;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -105,7 +104,7 @@ public class EmergencyService extends Service {
                         Log.d(TAG,"area data divide");
 
                         for (Bitmap image : divededImages) {
-                            processedImages.add(Bitmap.createScaledBitmap(image, 299,299, true)); // 리사�즈 �서 벡터�
+                            processedImages.add(Bitmap.createScaledBitmap(image, 299,299, true)); // resize
                         }
 
                         for(int i=0; i < height*height ; i++){
@@ -122,29 +121,22 @@ public class EmergencyService extends Service {
                                 graph.addEdge(i, (int)(i+height));
                         }
 
+
+                        // 너비우선 탐색을 이용 하여 스마트 랜딩
                         graph.runBFS((int)((height*height)/2),classifier, processedImages);
-                        // 모델 �작
 
-
-                        //CustomObject shortestPathDetection(labelList);
-                        //ImageLabelInfo labelInfo = shortestPathDetection(labelInfoList);
-
-                        //
+                        // safe area classfication
                         safeClassifier = new SafeImageClassifier(mainActivity);
                         safeClassifier.setNumThreads(1);
                         SpannableStringBuilder textToShow = new SpannableStringBuilder();
-                        classifier.classifyFrame(labelInfo.getImage(), textToShow);
-                        String landingAreaClass = classifier.getLabelProcess().getLabelList().get(0).getKey();
+                        classifier.classifyFrame(graph.getLandingImg(), textToShow);
+                        String landingAreaText = classifier.getLabelProcess().getLabelList().get(0).getKey();
 
 
-                        //safe/unsafe
+                        //draw section
                         resultDrawer = new ResultDrawer();
-                        resultDrawer.drawAreaSection(mainActivity, (int)height, testData, labelInfoList);
+                        resultDrawer.drawAreaSection(mainActivity, (int) height, testData, labelInfoList); //landingAreaText
 
-                        // Landing
-
-                        // Calculate Shortest Path ( with greedy algorythm)
-                        //landingController.smartLanding((int)height,labelInfoList);
 
                         // Release Resources
 
@@ -206,7 +198,7 @@ public class EmergencyService extends Service {
 
         private int V; // 노드의 개수
         private LinkedList<Integer> adj[]; // 인접 리스트
-
+        private Bitmap landingImg;
 
         /** 생성자 */
         public Graph(int v) {
@@ -253,7 +245,9 @@ public class EmergencyService extends Service {
                 ImageLabelInfo label = new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),(int)(edge/height),(int)(edge%height));
                 Log.d(TAG,"row : " + label.getRow() + ", cols : " + label.getCols() + ", value : " + label.getKey() + ", edge : " + edge);
                 if(label.getKey().equals("safe") && landing == false){
-                    safeLabel = label;
+
+                    landingImg = label.getImage();
+
                     landingController.setSdkManager(sdkManager);
 
                     landingController.setHeight((int)height);
@@ -284,33 +278,8 @@ public class EmergencyService extends Service {
             landing = false;
         }
 
-//        public void BFS(int s) {
-//            // 노드의 방문 여부 판단 (초깃값: false)
-//            boolean visited[] = new boolean[V];
-//            // BFS 구현을 위한 큐(Queue) 생성
-//            LinkedList<Integer> queue = new LinkedList<Integer>();
-//
-//            // 현재 노드를 방문한 것으로 표시하고 큐에 삽입(enqueue)
-//            visited[s] = true;
-//            queue.add(s);
-//
-//            // 큐(Queue)가 빌 때까지 반복
-//            while (queue.size() != 0) {
-//                // 방문한 노드를 큐에서 추출(dequeue)하고 값을 출력
-//                s = queue.poll();
-//                System.out.print(s + " ");
-//
-//                // 방문한 노드와 인접한 모든 노드를 가져온다.
-//                Iterator<Integer> i = adj[s].listIterator();
-//                while (i.hasNext()) {
-//                    int n = i.next();
-//                    // 방문하지 않은 노드면 방문한 것으로 표시하고 큐에 삽입(enqueue)
-//                    if (!visited[n]) {
-//                        visited[n] = true;
-//                        queue.add(n);
-//                    }
-//                }
-//            }
-//        }
+        public Bitmap getLandingImg() {
+            return landingImg;
+        }
     }
 }
