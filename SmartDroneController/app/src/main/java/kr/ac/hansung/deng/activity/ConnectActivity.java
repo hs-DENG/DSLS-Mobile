@@ -187,6 +187,7 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
         spinnerAdapter = new ArrayAdapter(this, R.layout.item_spinner, groups);
         mySpinner.setAdapter(spinnerAdapter);
 
+<<<<<<< HEAD
 //        mySpinner.setOnItemClickListener(new AdapterView.OnItemSelectedListener() {
 ////            @Override
 ////            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -199,6 +200,19 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
 ////            }
 ////        });
         company= "DJI";
+=======
+        /*mySpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(mySpinner.getItemAtPosition(position).equals("DJI"))
+                    company = "DJI";
+                else if(mySpinner.getItemAtPosition(position).equals("Xiaomi"))
+                    company = "Xiaomi";
+                else if(mySpinner.getItemAtPosition(position).equals("Parrot"))
+                    company = "Parrot";
+            }
+        });*/
+>>>>>>> origin/tylee
 
         popupView = View.inflate(this, R.layout.dialog_activity, null);
         popup = new PopupWindow(popupView, 1000, 1000, true);

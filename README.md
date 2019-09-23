@@ -121,8 +121,8 @@
  &nbsp;●만들어진 Model은 .pb 파일로 생성되며 Andoird Application에서 사용하기 위해서 .tflite로 변환하여 사용합니다.빌드했던 OS환경은 MAC이였기에 경로지정시 유의하시기 바랍니다. <br>
 ```
 bazel run //tensorflow/lite/toco:toco — \
-—input_file=/Users/taehwan/tensorEx/newgraph/newphone2_output_graph.pb \
-—output_file=/Users/taehwan/tensorEx/newgraph/newphone2_output_graph.tflite \
+—input_file= 'input_file_path'/output_graph.pb \
+—output_file='output_file_path'/output_graph.tflite \
 —input_format=TENSORFLOW_GRAPHDEF \
 —output_format=TFLITE \
 —input_shape=1,299,299,3 \
