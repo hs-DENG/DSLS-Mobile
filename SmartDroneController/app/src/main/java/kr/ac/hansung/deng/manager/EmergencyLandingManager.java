@@ -17,6 +17,7 @@ public class EmergencyLandingManager{
     private SDKManager sdkManager;
 
     private MainActivity mainActivity;
+    private boolean running = false;
 
     public void init(SDKManager sdkManager){
         this.sdkManager = sdkManager;
@@ -42,5 +43,13 @@ public class EmergencyLandingManager{
 
     public void setEmergencyService(EmergencyService emergencyService) {
         this.emergencyService = emergencyService;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
     }
 }

@@ -46,6 +46,7 @@ public class FPVApplication extends Application implements SDKApplication{
     }
 
     public FPVApplication() {
+        Log.d("SEQUENCE TEST", "2");
         Log.d("FPVDemoApplication", "FPVDemoApplication 생성");
     }
 
@@ -80,12 +81,103 @@ public class FPVApplication extends Application implements SDKApplication{
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d("SEQUENCE TEST", "4");
         mHandler = new Handler(Looper.getMainLooper());
 
         /**
          * When starting SDK services, an instance of interface DJISDKManager.DJISDKManagerCallback will be used to listen to
          * the SDK Registration result and the product changing.
          */
+       /* mDJISDKManagerCallback = new DJISDKManager.SDKManagerCallback() {
+
+            //Listens to the SDK registration result
+            @Override
+            public void onRegister(DJIError djiError) {
+                if(djiError == DJISDKError.REGISTRATION_SUCCESS) {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Register Success fa", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    DJISDKManager.getInstance().startConnectionToProduct();
+
+                } else {
+
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Register sdk fails, check network is available", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                }
+                Log.e("TAG", djiError.toString());
+            }
+
+            @Override
+            public void onProductDisconnect() {
+                Log.d("TAG", "onProductDisconnect");
+                notifyStatusChange();
+            }
+            @Override
+            public void onProductConnect(BaseProduct baseProduct) {
+                Log.d("TAG", String.format("onProductConnect newProduct:%s", baseProduct));
+                notifyStatusChange();
+
+            }
+            @Override
+            public void onComponentChange(BaseProduct.ComponentKey componentKey, BaseComponent oldComponent,
+                                          BaseComponent newComponent) {
+                if (newComponent != null) {
+                    newComponent.setComponentListener(new BaseComponent.ComponentListener() {
+
+                        @Override
+                        public void onConnectivityChange(boolean isConnected) {
+                            Log.d("TAG", "onComponentConnectivityChanged: " + isConnected);
+                            notifyStatusChange();
+                        }
+                    });
+                }
+
+                Log.d("TAG",
+                        String.format("onComponentChange key:%s, oldComponent:%s, newComponent:%s",
+                                componentKey,
+                                oldComponent,
+                                newComponent));
+            }
+        };
+        //Check the permissions before registering the application for android system 6.0 above.
+        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionCheck2 = ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.READ_PHONE_STATE);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (permissionCheck == 0 && permissionCheck2 == 0)) {
+            //This is used to start SDK services and initiate SDK.
+            DJISDKManager.getInstance().registerApp(getApplicationContext(), mDJISDKManagerCallback);
+            Toast.makeText(getApplicationContext(), "registering, pls wait...", Toast.LENGTH_LONG).show();
+
+        } else {
+            Toast.makeText(getApplicationContext(), "Please check if the permission is granted.", Toast.LENGTH_LONG).show();
+        }*/
+    }
+
+    private void notifyStatusChange() {
+        mHandler.removeCallbacks(updateRunnable);
+        mHandler.postDelayed(updateRunnable, 500);
+    }
+
+    private Runnable updateRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            Intent intent = new Intent(FLAG_CONNECTION_CHANGE);
+            getApplicationContext().sendBroadcast(intent);
+        }
+    };
+
+    public void registration(){
         mDJISDKManagerCallback = new DJISDKManager.SDKManagerCallback() {
 
             //Listens to the SDK registration result
@@ -160,18 +252,4 @@ public class FPVApplication extends Application implements SDKApplication{
             Toast.makeText(getApplicationContext(), "Please check if the permission is granted.", Toast.LENGTH_LONG).show();
         }
     }
-
-    private void notifyStatusChange() {
-        mHandler.removeCallbacks(updateRunnable);
-        mHandler.postDelayed(updateRunnable, 500);
-    }
-
-    private Runnable updateRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            Intent intent = new Intent(FLAG_CONNECTION_CHANGE);
-            getApplicationContext().sendBroadcast(intent);
-        }
-    };
 }

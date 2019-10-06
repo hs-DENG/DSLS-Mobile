@@ -2,6 +2,7 @@ package kr.ac.hansung.deng.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import dji.sdk.base.BaseProduct;
 import dji.sdk.products.Aircraft;
+import kr.ac.hansung.deng.app.SDCApplication;
 import kr.ac.hansung.deng.driver.DJISDKDriver;
 import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.sdk.FPVApplication;
@@ -38,6 +40,7 @@ import kr.ac.hansung.deng.smartdronecontroller.R;
 public class ConnectActivity extends Activity implements View.OnClickListener{
     private static final String TAG = ConnectActivity.class.getName();
 
+    private final Activity context = this;
     private SDKManager sdkManager;
 
     private Button mBtnOpen;
@@ -50,6 +53,7 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
     private Button mBtnOk;
     private String company="";
 
+    private Application sdkApplication;
     private static final String[] REQUIRED_PERMISSION_LIST = new String[]{
             Manifest.permission.VIBRATE,
             Manifest.permission.INTERNET,
@@ -76,6 +80,7 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("SEQUENCE TEST", "5");
         sdkManager = DJISDKDriver.getInstance();
         ((DJISDKDriver)sdkManager).setContext(this);
         checkAndRequestPermissions();
@@ -168,17 +173,17 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
 
         mBtnOpen = (Button) findViewById(R.id.btn_open);
         mBtnOpen.setOnClickListener(this);
-        mBtnOpen.setEnabled(false
-        );
-        mBtnReConnect = (Button)findViewById(R.id.btn_reConnect);
+        mBtnOpen.setEnabled(false);
+        mBtnReConnect = (Button)findViewById(R.id.btn_network);
         mBtnReConnect.setOnClickListener(this);
 
-
+        String group0 = "";
         String group1 = "DJI";
         String group2 = "Xiaomi";
         String group3 = "Parrot";
 
         ArrayList<String> groups = new ArrayList<>();
+        groups.add(group0);
         groups.add(group1);
         groups.add(group2);
         groups.add(group3);
@@ -187,32 +192,35 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
         spinnerAdapter = new ArrayAdapter(this, R.layout.item_spinner, groups);
         mySpinner.setAdapter(spinnerAdapter);
 
-<<<<<<< HEAD
-//        mySpinner.setOnItemClickListener(new AdapterView.OnItemSelectedListener() {
-////            @Override
-////            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-////                if(mySpinner.getItemAtPosition(position).equals("DJI"))
-////                    company = "DJI";
-////                else if(mySpinner.getItemAtPosition(position).equals("Xiaomi"))
-////                    company = "Xiaomi";
-////                else if(mySpinner.getItemAtPosition(position).equals("Parrot"))
-////                    company = "Parrot";
-////            }
-////        });
-        company= "DJI";
-=======
-        /*mySpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        company= "";
+
+        mySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(mySpinner.getItemAtPosition(position).equals("DJI"))
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(mySpinner.getItemAtPosition(position).equals("")){
+
+                }
+                else if(mySpinner.getItemAtPosition(position).equals("DJI")) {
                     company = "DJI";
-                else if(mySpinner.getItemAtPosition(position).equals("Xiaomi"))
+                    sdkApplication = new FPVApplication();
+                    ((FPVApplication)sdkApplication).setContext(SDCApplication.getContext());
+                    sdkApplication.onCreate();
+                }
+                else if(mySpinner.getItemAtPosition(position).equals("Xiaomi")) {
                     company = "Xiaomi";
-                else if(mySpinner.getItemAtPosition(position).equals("Parrot"))
+                }
+                else if(mySpinner.getItemAtPosition(position).equals("Parrot")) {
                     company = "Parrot";
+                }
             }
-        });*/
->>>>>>> origin/tylee
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         popupView = View.inflate(this, R.layout.dialog_activity, null);
         popup = new PopupWindow(popupView, 1000, 1000, true);
@@ -272,13 +280,19 @@ public class ConnectActivity extends Activity implements View.OnClickListener{
 //                bundle.putSerializable("sdkManager", sdkManager);
 //                intent.putExtras(bundle);
                 startActivity(intent);
+                mBtnOpen.setEnabled(false);
+
                 break;
             }
-            case R.id.btn_reConnect:{
-               // Toast.makeText(this,"Trying Re Connect",Toast.LENGTH_SHORT).show();
-               // Log.d("test","Trying Re Connect");
-                sdkManager.connect();
+            case R.id.btn_network:{
+                if(company==""){
+                    Toast.makeText(context, "please select an aircraft company and try again", Toast.LENGTH_SHORT).show();
+                    break;
+                }
+                else
+                    ((FPVApplication)sdkApplication).registration();
             }
+
             default:
                 break;
         }

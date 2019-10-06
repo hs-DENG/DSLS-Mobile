@@ -5,7 +5,7 @@
     android:id="@+id/myLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#8DFBFF"
+    android:background="#00BCD4"
     android:gravity="bottom"
     android:orientation="vertical"
     tools:context="kr.ac.hansung.deng.activity.ConnectActivity">
@@ -75,7 +75,7 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginBottom="48dp"
-            android:background="#8DFBFF"
+            android:background="#00BCD4"
             android:onClick="mOnClickMenu"
             android:src="@drawable/menu" />
 
@@ -84,28 +84,28 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <Button
-            android:id="@+id/btn_reConnect"
-            android:layout_width="0dp"
+            android:id="@+id/btn_network"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_weight="1"
             android:background="@drawable/button"
-            android:text="Connect"
+            android:text="aircraft connect"
             android:textAllCaps="false"
             android:textSize="20sp"
             android:typeface="monospace" />
 
         <Button
             android:id="@+id/btn_open"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_weight="1"
             android:background="@drawable/button"
-            android:text="Open"
+            android:text="Go to Fly"
             android:textAllCaps="false"
             android:textSize="20sp"
             android:typeface="monospace" />

@@ -76,15 +76,16 @@ public class DJISDKDriver implements SDKManager, TextureView.SurfaceTextureListe
     //protected Camera camera;
     private TextureView myVideoSurface = null;
     private Handler handler;
-    private Thread mThread = null;
+    private static VideoThread mThread = null;
     private boolean initFlag = false;
+    private boolean videoFlag = false;
 
     private Bitmap captureView;
 
     // connection
     @Override
     public void connect(){
-       //TODO °ê²°
+        //TODO °ê²°
         Toast.makeText(mContext,"Trying Re Connect!!!",Toast.LENGTH_SHORT).show();
     }
 
@@ -129,45 +130,12 @@ public class DJISDKDriver implements SDKManager, TextureView.SurfaceTextureListe
                 }
             }
         };
+        //if(mThread == null) {
+        mThread = new VideoThread();
+        videoFlag = false;
+        mThread.start();
+        //}
 
-        if(mThread == null){
-            mThread = new Thread("My Thread"){
-                @Override
-                public void run(){
-                    while(!initFlag){
-                        //Log.d(TAG, "myVideoSurface is " + myVideoSurface);
-                        if(myVideoSurface != null) {
-                            //Log.d(TAG, "1");
-                            // The callback for receiving the raw H264 video data for camera live view
-                            if(!initFlag){
-                                Log.d(TAG, "mVideoSurface : " + myVideoSurface);
-                                initPreviewer();
-                                initFlag = true;
-                            }
-
-                            Camera camera = FPVApplication.getCameraInstance();
-
-                            if (camera != null) {
-
-                                camera.setSystemStateCallback(new SystemState.Callback() {
-                                    @Override
-                                    public void onUpdate(SystemState cameraSystemState) {
-                                        if (null != cameraSystemState) {
-
-                                            int recordTime = cameraSystemState.getCurrentVideoRecordingTimeInSeconds();
-                                            int minutes = (recordTime % 3600) / 60;
-                                            int seconds = recordTime % 60;
-
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }
-            };
-            mThread.start();
-        }
     }
     private void initPreviewer(){
         Log.d(TAG, "initPreviewer()");
@@ -196,6 +164,29 @@ public class DJISDKDriver implements SDKManager, TextureView.SurfaceTextureListe
             //Reset the callback
             VideoFeeder.getInstance().getPrimaryVideoFeed().addVideoDataListener(null);
         }
+        try {
+            Log.d(TAG,"thread interrupted : " + mThread.isInterrupted());
+            mThread.interrupt();
+            videoFlag=true;
+            //getmThread().interrupt();
+            //setmThread(null);
+            Log.d(TAG,"thread interrupted ? " + mThread.isAlive() + ", mThread : " + mThread);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        // mThread();
+        // mThread = null;
+        initFlag=false;
+    }
+
+    public synchronized static VideoThread getmThread() {
+
+        return mThread;
+    }
+
+    public void setmThread(VideoThread mThread) {
+        this.mThread = mThread;
     }
 
     @Override
@@ -653,4 +644,30 @@ public class DJISDKDriver implements SDKManager, TextureView.SurfaceTextureListe
         thread.start();
     }
 
+    class VideoThread extends Thread{
+
+        @Override
+        public void run() {
+
+            while(!initFlag && !videoFlag){
+                //Log.d(TAG, "myVideoSurface is " + myVideoSurface);
+                if(myVideoSurface != null) {
+                    //Log.d(TAG, "1");
+                    // The callback for receiving the raw H264 video data for camera live view
+                    if(!initFlag){
+                        Log.d(TAG, "mVideoSurface : " + myVideoSurface);
+                        initPreviewer();
+                        initFlag = true;
+                    }
+                }
+            }
+
+        }
+
+
+
+    }
+
+
 }
+

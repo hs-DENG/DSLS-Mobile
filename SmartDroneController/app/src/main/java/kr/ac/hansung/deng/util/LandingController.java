@@ -1,5 +1,7 @@
 package kr.ac.hansung.deng.util;
 
+import android.util.Log;
+
 import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.model.ImageLabelInfo;
 
@@ -17,7 +19,7 @@ public class LandingController extends Thread{
     private void smartLanding(){
         int centerRow = height/2;
         int centerCols = height/2;
-
+        Log.d("LandingController","smart landing");
         if(labelInfo != null){
             if(centerRow > labelInfo.getRow()){
                 for(int i=0; i<Math.abs(centerRow - labelInfo.getRow()); i++) {
@@ -27,7 +29,7 @@ public class LandingController extends Thread{
                         Thread.sleep(2000);
                         sdkManager.forward();
                     }catch (Exception e){
-
+                        e.printStackTrace();
                     }
                 }
             }else if (centerRow < labelInfo.getRow()){
@@ -38,7 +40,7 @@ public class LandingController extends Thread{
                         Thread.sleep(2000);
                         sdkManager.back();
                     }catch (Exception e){
-
+                        e.printStackTrace();
                     }
                 }
             }
@@ -51,7 +53,7 @@ public class LandingController extends Thread{
                         Thread.sleep(2000);
                         sdkManager.left();
                     }catch (Exception e){
-
+                        e.printStackTrace();
                     }
                 }
             } else if (centerCols < labelInfo.getCols()) {
@@ -62,6 +64,7 @@ public class LandingController extends Thread{
                         Thread.sleep(2000);
                         sdkManager.right();
                     }catch (Exception e){
+                        e.printStackTrace();
                     }
                 }
             }
@@ -70,7 +73,7 @@ public class LandingController extends Thread{
                 sdkManager.landing();
 
             }catch (Exception e){
-
+                e.printStackTrace();
             }
         }
     }

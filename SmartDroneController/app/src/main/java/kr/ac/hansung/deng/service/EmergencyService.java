@@ -20,6 +20,7 @@ import kr.ac.hansung.deng.ML.ImageClassifierFloatInception;
 import kr.ac.hansung.deng.ML.SafeImageClassifier;
 import kr.ac.hansung.deng.activity.MainActivity;
 import kr.ac.hansung.deng.driver.DJISDKDriver;
+import kr.ac.hansung.deng.manager.EmergencyLandingManager;
 import kr.ac.hansung.deng.manager.SDKManager;
 import kr.ac.hansung.deng.model.ImageLabelInfo;
 import kr.ac.hansung.deng.util.ImageDivide;
@@ -63,9 +64,12 @@ public class EmergencyService extends Service {
     private boolean landing = false;
     private ResultDrawer resultDrawer;
 
+    private String landingAreaText = "";
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand()");
+        EmergencyLandingManager.getInstance().setRunning(true);
         if(mThread == null){
             mThread = new Thread("My Thread"){
                 @Override
@@ -125,18 +129,30 @@ public class EmergencyService extends Service {
                         // 너비우선 탐색을 이용 하여 스마트 랜딩
                         graph.runBFS((int)((height*height)/2),classifier, processedImages);
 
+
+
                         // safe area classfication
                         safeClassifier = new SafeImageClassifier(mainActivity);
                         safeClassifier.setNumThreads(1);
-                        SpannableStringBuilder textToShow = new SpannableStringBuilder();
-                        classifier.classifyFrame(graph.getLandingImg(), textToShow);
-                        String landingAreaText = classifier.getLabelProcess().getLabelList().get(0).getKey();
+                        SpannableStringBuilder textToShow1 = new SpannableStringBuilder();
+                        Log.d(TAG,"img : " + graph.getLandingImg());
 
+                        // TODO graph.getLandingImg() 가 null 일때 예외처리
+
+                        if(graph.getLandingImg() == null){
+                            safeClassifier.classifyFrame(labelInfoList.get(0).getImage(), textToShow1);
+                            landingAreaText = "safe area not found";
+                            Log.d(TAG, "label : " + landingAreaText);
+                        }
+                        else{
+                            safeClassifier.classifyFrame(graph.getLandingImg(), textToShow1);
+                            landingAreaText = safeClassifier.getLabelProcess().getLabelList().get(0).getKey();
+                            Log.d(TAG, "label : " + landingAreaText);
+                        }
 
                         //draw section
                         resultDrawer = new ResultDrawer();
-                        resultDrawer.drawAreaSection(mainActivity, (int) height, testData, labelInfoList); //landingAreaText
-
+                        resultDrawer.drawAreaSection(mainActivity, (int) height, testData, labelInfoList, landingAreaText);
 
                         // Release Resources
 
@@ -163,7 +179,7 @@ public class EmergencyService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        EmergencyLandingManager.getInstance().setRunning(false);
         Log.d(TAG, "onDestroy()");
 
         if(mThread != null)
@@ -198,7 +214,7 @@ public class EmergencyService extends Service {
 
         private int V; // 노드의 개수
         private LinkedList<Integer> adj[]; // 인접 리스트
-        private Bitmap landingImg;
+        private Bitmap landingImg, nullImg;
 
         /** 생성자 */
         public Graph(int v) {
@@ -243,7 +259,11 @@ public class EmergencyService extends Service {
                 classifier.classifyFrame(processedImages.get(edge), textToShow);
 
                 ImageLabelInfo label = new ImageLabelInfo(classifier.getLabelProcess().getLabelList().get(0).getKey(),(int)(edge/height),(int)(edge%height));
+
+                label.setImage(processedImages.get(edge));
+
                 Log.d(TAG,"row : " + label.getRow() + ", cols : " + label.getCols() + ", value : " + label.getKey() + ", edge : " + edge);
+
                 if(label.getKey().equals("safe") && landing == false){
 
                     landingImg = label.getImage();
@@ -257,6 +277,7 @@ public class EmergencyService extends Service {
 
                     landing = true;
                 }
+
 
                 classifier.close();
                 labelInfoList.add(label);
@@ -281,5 +302,6 @@ public class EmergencyService extends Service {
         public Bitmap getLandingImg() {
             return landingImg;
         }
+
     }
 }

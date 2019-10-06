@@ -16,6 +16,7 @@ import kr.ac.hansung.deng.driver.DJISDKDriver;
 import kr.ac.hansung.deng.manager.DroneInfoManager;
 import kr.ac.hansung.deng.manager.EmergencyLandingManager;
 import kr.ac.hansung.deng.manager.SDKManager;
+import kr.ac.hansung.deng.sdk.FPVApplication;
 import kr.ac.hansung.deng.smartdronecontroller.R;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -29,7 +30,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EmergencyLandingManager emergencyLandingManager;
 
     // Component
-    private ImageButton takeOffBtn, landingBtn, emergencyBtn, captureBtn;
     private ImageButton btnUp, btnDown, btnForward, btnBack, btnLeft, btnRight;
     private SeekBar mSeekBar;
     private TextView heightText;
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Toast.makeText(this, "mainActivity onCreate()!", Toast.LENGTH_SHORT).show();
         setContentView(R.layout.activity_main);
 
         Intent intent = getIntent();
@@ -120,10 +121,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
     public void initUI(){
-        takeOffBtn = (ImageButton) findViewById(R.id.btn_takeoff);
-        landingBtn = (ImageButton) findViewById(R.id.btn_landing);
-        emergencyBtn = (ImageButton) findViewById(R.id.btn_emergency);
-        captureBtn = (ImageButton) findViewById(R.id.btn_capture);
 
         btnUp = (ImageButton)findViewById(R.id.btn_up);
         btnUp.setOnClickListener(this);
@@ -138,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnBack = (ImageButton)findViewById(R.id.btn_back);
         btnBack.setOnClickListener(this);
         heightText = (TextView)findViewById(R.id.height);
+
     }
 
     @Override
@@ -178,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onResume() {
-        Log.e(TAG, "onResume");
+        Log.e(TAG, "onResume~~");
         super.onResume();
 
         if(mVideoSurface == null) {
@@ -188,28 +186,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onPause() {
-        Log.e(TAG, "onPause");
+        Log.e(TAG, "onPause~~");
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        Log.e(TAG, "onStop");
+        Log.e(TAG, "onStop~~");
         super.onStop();
+
     }
 
     public void onReturn(View view){
-        Log.e(TAG, "onReturn");
-        this.finish();
+        Log.e(TAG, "onReturn~~");
+        //this.finish();
     }
 
     @Override
     protected void onDestroy() {
-        Log.e(TAG, "onDestroy");
-        sdkManager.removeVideo();
-        if(emergencyLandingManager.getEmergencyService().getClassifier()!= null)
-            emergencyLandingManager.getEmergencyService().getClassifier().close();
         super.onDestroy();
+        Log.e(TAG, "onDestroy~~");
+
+        sdkManager.removeVideo();
+
+        if(emergencyLandingManager.isRunning()) {
+            if (emergencyLandingManager.getEmergencyService().getClassifier() != null)
+                emergencyLandingManager.getEmergencyService().getClassifier().close();
+        }
+
+
         this.finish();
     }
 
